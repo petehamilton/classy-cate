@@ -12,7 +12,7 @@ set :short_ttl, 400
 set :long_ttl, 4600
 
 get '/' do
-  "Static Asset Server for Classy CATE"
+  redirect "https://github.com/PeterHamilton/classy-cate#classy-cate"
 end
 
 # Asset Serving
