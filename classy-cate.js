@@ -247,7 +247,7 @@
     footer_html += '            <a href="http://www.twitter.com/peterejhamilton"><i class="icon-twitter" /></a> ';
     footer_html += '            <a href="http://www.github.com/peterejhamilton"><i class="icon-github" /></a> ';
     footer_html += '        </p>';
-    footer_html += '        <p>Help lessen the pain - <a href="#"><i class="icon-github-alt" /></a></p>';
+    footer_html += '        <p>Help lessen the pain - <a href="https://github.com/PeterHamilton/classy-cate"><i class="icon-github-alt" /></a></p>';
     footer_html += '    </div>';
     footer_html += '</footer>';
     container.after(footer_html);
