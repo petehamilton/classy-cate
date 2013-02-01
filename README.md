@@ -6,8 +6,9 @@ CATE, without ~~the~~ as much hurt.
 
 
 ## Installation
-Install `classy-cate.user.js` as a Userscript in [Chrome](https://www.google.com/intl/en/chrome/browser/) or use [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) in firefox.
+Install `http://classy-cate.herokuapp.com/classy-cate.user.js` as a Userscript in [Chrome](https://www.google.com/intl/en/chrome/browser/) or use [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) in firefox.
 
+- TamperMonkey is a great chrome extension for this. (Thanks to @vahokif)
 - [Allow Third party Chrome Scripts](http://solidsprite.com/2012/08/how-to-install-third-party-userscripts-in-chrome-mac-os-x/)
 - [Enabling 3rd Party Chrome user scripts](http://userscripts.org/topics/113176) (OSX)
 
