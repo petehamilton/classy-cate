@@ -15,8 +15,18 @@ Install `classy-cate.user.js` as a Userscript in [Chrome](https://www.google.com
 
 - **Timetable page**
 - **Grades Page**
+- Non-Undergrads may experience missing/broken links. I have no idea.
 - Prevent CC from destroying non-targeted pages
 - Refactor code in functions (couldn't until now)
+
+## Summary of Improvements
+
+- Implemented a Navbar for shortcuts
+- Changelog + Version in Nav bar
+- Put everything in one row
+- Identity laid out better
+- Simpler interface for class selection
+- Simpler, nicer links for other CATE functionality
 
 ## Ideas
 
