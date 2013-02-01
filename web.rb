@@ -3,6 +3,7 @@ require 'json'
 require 'git'
 require 'heroku'
 require 'coffee-script'
+require 'less'
 
 get '/' do
   "Static Asset Server for Classy CATE"
