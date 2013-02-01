@@ -16,7 +16,6 @@ Install classy-cate.user.js as a Userscript in [Chrome](https://www.google.com/i
 - **Timetable page**
 - **Grades Page**
 - Prevent CC from destroying non-targeted pages
-- Nicer interface for class/timetable selection
 - Collapsible nav bar
 - Refactor code in functions (couldn't until now)
 
