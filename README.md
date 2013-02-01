@@ -8,6 +8,7 @@ CATE, without the hurt.
 - Nicer interface for class/timetable selection
 - Collapsible nav bar
 - Refactor code in functions (couldn't until now)
+- **Tackle the Timetable page**
 
 ## Development
 
