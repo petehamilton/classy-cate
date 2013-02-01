@@ -12,10 +12,10 @@ function main() {
     // Let's Bootstrap this shizzle. Files from http://www.bootstrapcdn.com/?v=01282013154951
     $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
     $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
-    $('head').append('<link rel="stylesheet" href="https://raw.github.com/PeterHamilton/classy-cate/master/classy-cate.css" type="text/css" />');
+    $('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
 
     $('head').append('<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>');
-    $('head').append('<script type="text/javascript" src="https://raw.github.com/PeterHamilton/classy-cate/master/classy-cate.js"></script>');
+    $('head').append('<script type="text/javascript" src="https://classy-cate.herokuapp.com/classy-cate.js"></script>');
 }
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading
