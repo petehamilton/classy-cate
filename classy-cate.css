@@ -11,6 +11,11 @@
   max-width: 180px;
 }
 
+.profile-image {
+  max-width: 120px;
+}
+
+
 a i {
   font-size: 20px;
 }
