@@ -6,10 +6,8 @@ require 'coffee-script'
 require 'less'
 require 'dalli'
 
-set :cache, Dalli::Client.new
-set :enable_cache, true
-set :short_ttl, 400
-set :long_ttl, 4600
+# Default 10 minute cache
+set :cache, Dalli::Client.new(nil, {:expires_in => 60*10})
 
 get '/' do
   redirect "https://github.com/PeterHamilton/classy-cate#classy-cate"
@@ -21,11 +19,23 @@ get '/classy-cate.user.js' do
 end
 
 get '/classy-cate.js' do
-  coffee :classy_cate
+  js = settings.cache.get('classy-cate-js')
+  if js.nil?
+    logger.info "Caching Classy CATE JS"
+    js = coffee :classy_cate
+    settings.cache.set('classy-cate-js', js)
+  end
+  js
 end
 
 get '/classy-cate.css' do
-  less :classy_cate
+  css = settings.cache.get('classy-cate-css')
+  if css.nil?
+    logger.info "Caching Classy CATE CSS"
+    css = less :classy_cate
+    settings.cache.set('classy-cate-css', css)
+  end
+  css
 end
 
 # Auto Deploy Methods
