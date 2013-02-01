@@ -2,11 +2,26 @@ require 'sinatra'
 require 'json'
 require 'git'
 require 'heroku'
+require 'coffee-script'
 
 get '/' do
   "Static Asset Server for Classy CATE"
 end
 
+# Asset Serving
+get '/classy-cate.user.js' do
+  send_file('classy-cate.user.js')
+end
+
+get '/classy-cate.js' do
+  coffee :classy_cate
+end
+
+get '/classy-cate.css' do
+  less :classy_cate
+end
+
+# Auto Deploy Methods
 get '/public_key' do
   ::CURRENT_SSH_KEY
 end
