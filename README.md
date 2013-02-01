@@ -2,6 +2,13 @@
 
 CATE, without the hurt.
 
+## Rough TODO List (Please Help)
+
+- Prevent CC from destroying non-homepage pages
+- Nicer interface for class/timetable selection
+- Collapsible nav bar
+- Refactor code in functions (couldn't until now)
+
 ## Development
 
 To develop and help improve classy-cate, do the following:
