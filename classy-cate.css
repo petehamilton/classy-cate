@@ -28,9 +28,22 @@ a i {
   font-size: 30px;
 }
 
-.footer {text-align: center;
-    padding: 30px 0;
-    margin-top: 70px;
-    border-top: 1px solid #E5E5E5;
-    background-color: whiteSmoke;
+.footer {
+  text-align: center;
+  padding: 30px 0;
+  margin-top: 70px;
+  border-top: 1px solid #E5E5E5;
+  background-color: whiteSmoke;
+}
+
+select {
+  width: 150px;
+}
+
+.form-horizontal .control-label {
+  width: 60px;
+}
+
+.form-horizontal .controls {
+  margin-left: 80px;
 }
