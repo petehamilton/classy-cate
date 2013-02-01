@@ -11,7 +11,7 @@ end
 
 # Asset Serving
 get '/classy-cate.user.js' do
-  send_file('classy-cate.user.js')
+  send_file('views/classy_cate.user.js')
 end
 
 get '/classy-cate.js' do
