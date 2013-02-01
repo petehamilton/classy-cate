@@ -2,7 +2,7 @@
 
 CATE, without the hurt.
 
-![Screen Shot 2013-02-01 at 02 35 01](https://f.cloud.github.com/assets/510845/117032/1bde6e48-6c18-11e2-9452-0a37d6cd08d6.png)
+![Classy CATE](https://f.cloud.github.com/assets/510845/117032/1bde6e48-6c18-11e2-9452-0a37d6cd08d6.png "Classy CATE")
 
 
 ## Installation
