@@ -3,3 +3,5 @@
  * @author       Pater Hamilton
  * @description  CATE hurts my eyes. This makes it hurt them less
  */
+
+console.log("External Classy CATE JS Loaded");
