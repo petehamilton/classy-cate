@@ -99,12 +99,10 @@
 
     // Remodel the profile table
     main_cate_table = $('table:eq(2)');
-    console.log(main_cate_table);
     title_row = main_cate_table.find('td table td table tr:eq(0)');
     profile_image = title_row.find('img');
     profile_image.removeAttr('height');
     profile_image.addClass('profile-image');
-    console.log(profile_image);
     field_titles = title_row.find('th').slice(1).map(function(i, val) { return $(val).html(); });
 
     value_row = main_cate_table.find('td table td table tr:eq(1)');
@@ -210,7 +208,6 @@
     ////////////////////////////////////////////////////////////////////////////
     // More CATE Links /////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    console.log(main_cate_table);
     links_tds = main_cate_table.find('tr td ul table:eq(9) tr td:nth-child(3)');
     grading_schema_href = $(links_tds[1]).find('a').attr('href');
     documentation_href = $(links_tds[2]).find('a').attr('href');
