@@ -19,6 +19,13 @@ Install `classy-cate.user.js` as a Userscript in [Chrome](https://www.google.com
 - Collapsible nav bar
 - Refactor code in functions (couldn't until now)
 
+## Ideas
+
+- Scrape Timetable page
+  - Put below current interface
+  - Notify of upcoming deadlines
+  - Aggregate links to notes, exercises without jumping around a huge table
+
 ## Development
 
 To develop and help improve classy-cate, do the following:
