@@ -4,11 +4,12 @@ CATE, without the hurt.
 
 ## Rough TODO List (Please Help)
 
-- Prevent CC from destroying non-homepage pages
+- **Timetable page**
+- **Grades Page**
+- Prevent CC from destroying non-targeted pages
 - Nicer interface for class/timetable selection
 - Collapsible nav bar
 - Refactor code in functions (couldn't until now)
-- **Tackle the Timetable page**
 
 ## Development
 
