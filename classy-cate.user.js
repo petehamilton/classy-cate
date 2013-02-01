@@ -2,6 +2,7 @@
 // @name         CATE 2.0
 // @author       Pater Hamilton
 // @description  CATE Hurts eyes. This makes it hurt them less.
+// @version 0.1
 // @match https://cate.doc.ic.ac.uk/*
 // ==/UserScript==
 
