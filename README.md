@@ -1,6 +1,6 @@
 # Classy CATE
 
-CATE, without the hurt.
+CATE, without ~~the~~ as much hurt.
 
 ![Classy CATE](https://f.cloud.github.com/assets/510845/117032/1bde6e48-6c18-11e2-9452-0a37d6cd08d6.png "Classy CATE")
 
