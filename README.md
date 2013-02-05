@@ -40,9 +40,10 @@ Install `http://classy-cate.herokuapp.com/classy-cate.user.js` as a Userscript i
 
 To develop and help improve classy-cate, do the following:
 
-1. run the python HTTPS server with `python serve.py`
-2. Modify `classy-cate.user.js` js/css references to refer to the local python server e.g. `https://raw.github.com/PeterHamilton/classy-cate/master/ -> https://localhost:8443/classy-cate.css`
+1. Run the server with `thin start --ssl`
+2. Modify `classy-cate.user.js` js/css references to refer to the local python server e.g. `https://raw.github.com/PeterHamilton/classy-cate/master/ -> https://localhost:3000/classy-cate.css`
 3. Install your modified `classy-cate.user.js` as an Userscript/Greasemonkey extension in Chrome/Firefox.
+4. Modify `views/classy-cate.js` and `views/classy-cate.less`
 
 
 ## References
