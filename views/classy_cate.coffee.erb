@@ -16,8 +16,8 @@ reconstruct_main_page = ->
 
   # TODO: Make this work for any CATE page
   current_url = document.URL
-  current_year = CURRENT_URL.match("keyp=([0-9]+)")[1] #TODO: Error check
-  current_user = CURRENT_URL.match("[0-9]+:(.*)")[1] # TODO: Error Check
+  current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check
+  current_user = current_url.match("[0-9]+:(.*)")[1] # TODO: Error Check
 
   #//////////////////////////////////////////////////////////////////////////
   # Extract Details From Page
