@@ -16,6 +16,7 @@ Install `http://classy-cate.herokuapp.com/classy-cate.user.js` as a Userscript i
 
 - **Timetable page**
 - **Grades Page**
+- Scrub last vestige of CATE from homepage - the favicon! Use [this](http://stackoverflow.com/questions/260857/changing-website-favicon-dynamically/260876#260876)
 - Non-Undergrads may experience missing/broken links. I have no idea.
 - Prevent CC from destroying non-targeted pages
 - Refactor code in functions (couldn't until now)
