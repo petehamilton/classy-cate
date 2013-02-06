@@ -15,9 +15,9 @@ reconstruct_main_page = ->
   #//////////////////////////////////////////////////////////////////////////
 
   # TODO: Make this work for any CATE page
-  CURRENT_URL = document.URL
-  CURRENT_YEAR = CURRENT_URL.match("keyp=([0-9]+)")[1] #TODO: Error check
-  CURRENT_USER = CURRENT_URL.match("[0-9]+:(.*)")[1] # TODO: Error Check
+  current_url = document.URL
+  current_year = CURRENT_URL.match("keyp=([0-9]+)")[1] #TODO: Error check
+  current_user = CURRENT_URL.match("[0-9]+:(.*)")[1] # TODO: Error Check
 
   #//////////////////////////////////////////////////////////////////////////
   # Extract Details From Page
@@ -62,6 +62,9 @@ reconstruct_main_page = ->
   populate_html('body', MAIN_PAGE_HTML)
 
   $('#cc-version').html(version)
+  $('#nav-exercises').attr('href', timetable_url)
+  $('#nav-grades').attr('href', grading_schema_link)
+  $('#cc-current-year').html("(#{current_year})")
 
   $('#cc-identity-profile-image').attr('src', profile_image_src)
   $('#cc-identity-first-name').html(first_name)
@@ -75,8 +78,6 @@ reconstruct_main_page = ->
   available_years.each (i, val) ->
     $('#cc-year-dropdown').append '<li><a href="' + val.href + '">' + val.text + '</a></li>'
 
-  $('#nav-exercises').attr('href', timetable_url)
-  $('#nav-grades').attr('href', grading_schema_link)
 
   $('#cc-other-projects-portal').attr('href', projects_portal_link)
   $('#cc-other-extensions').attr('href', extensions_link)
