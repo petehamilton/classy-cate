@@ -1,0 +1,129 @@
+#identity-container.row
+  .span4
+    %h1.section-header Identity
+    %table.table.table-bordered.table-striped
+      %tbody
+        %tr
+          %td.profile-picture-container{:rowspan => "7"}
+            %img#cc-identity-profile-image.profile-image{:src => ""}/
+          %td
+            %b First Name
+          %td
+            %span#cc-identity-first-name
+        %tr
+          %td
+            %b Last Name
+          %td
+            %span#cc-identity-last-name
+        %tr
+          %td
+            %b Login
+          %td
+            %span#cc-identity-login
+        %tr
+          %td
+            %b Category
+          %td
+            %span#cc-identity-category
+        %tr
+          %td
+            %b Candidate No.
+          %td
+            %span#cc-identity-candidate-number
+        %tr
+          %td
+            %b CID
+          %td
+            %span#cc-identity-cid
+        %tr
+          %td
+            %b Personal Tutor
+          %td
+            %span#cc-identity-personal-tutor
+  .span4
+    %h1.section-header Exercise Timetable
+    %form.form-horizontal{:action => "/timetable.cgi", :type => "GET"}
+      .control-group
+        %label.control-label{:for => "period-select"} Period
+        #period-select-container.controls
+          %select#cc-period-select{:name => "period"}
+            %option{:value => "1"} Autumn Term
+            %option{:value => "2"} Christmas
+            %option{:value => "3"} Spring Term
+            %option{:value => "4"} Easter
+            %option{:value => "5"} Summer Term
+            %option{:value => "6"} June-July
+            %option{:value => "7"} August-September
+      .control-group
+        %label.control-label{:for => "class-select"} Class
+        #class-select-container.controls
+          %select#cc-class-select{:name => "class"}
+            %option{:value => "c1"} COMP 1
+            %option{:value => "c2"} COMP 2
+            %option{:value => "c3"} COMP 3
+            %option{:value => "c4"} COMP 4
+            %option{:value => "j1"} JMC 1
+            %option{:value => "j2"} JMC 2
+            %option{:value => "j3"} JMC 3
+            %option{:value => "j4"} JMC 4
+            %option{:value => "i2"} ISE 2
+            %option{:value => "i3"} ISE 3
+            %option{:value => "i4"} ISE 4
+            %option{:value => "v5"} Computing
+            %option{:value => "s5"} Computing Spec.
+            %option{:value => "a5"} Advanced
+            %option{:value => "r5"} Research
+            %option{:value => "y5"} Industrial
+            %option{:value => "b5"} Bioinformatic
+            %option{:value => "occ"} Occasional
+            %option{:value => "r6"} PhD
+            %option{:value => "ext"} External
+      .control-group
+        #button-container.controls
+          %button.btn Go
+      %input#cc-keyt{:name => "keyt", :type => "hidden", :value => ""}/
+  .span4
+    %h1.section-header Other Links
+    %ul.nav.nav-tabs.nav-stacked
+      %li.disabled
+        %a{:href => "#"}
+          .list-icon-container
+            %i.icon-bar-chart>
+            \ 
+          .list-text Analytics
+      %li
+        %a#cc-other-grading-schema{:href => "#"}
+          .list-icon-container
+            %i.icon-key>
+            \ 
+          .list-text Department Grading Schema
+      %li
+        %a#cc-other-documentation{:href => "#"}
+          .list-icon-container
+            %i.icon-file-alt>
+            \ 
+          .list-text Documentation
+      %li
+        %a#cc-other-extensions{:href => "#"}
+          .list-icon-container
+            %i.icon-exclamation-sign>
+            \ 
+          .list-text Late Submissions/Extensions
+      %li.disabled
+        %a{:href => "#"}
+          .list-icon-container
+            %i.icon-briefcase>
+            \ 
+          .list-text Lecture Notes + Exercises Registration
+      %li
+        %a#cc-other-projects-portal{:href => "#"}
+          .list-icon-container
+            %i.icon-lightbulb>
+            \ 
+          .list-text Projects Portal
+      %li.disabled
+        %a{:href => "#"}
+          .list-icon-container
+            %i.icon-magic>
+            \ 
+          .list-text Special Activities

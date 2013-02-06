@@ -1,0 +1,92 @@
+# TODO: Have a button which turns off the skin/improvements?
+# TODO: Move sections out into functions. Originally this wasn't possible,
+#       hence the ugly all-in-one-function implementation below
+
+MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page, :layout => :layout).gsub("\n", "") %>'
+
+# Helper method to populate an element from escaped HTML
+populate_html = (element, raw) ->
+  $(element).html($("<div/>").html(raw).text())
+
+reconstruct_main_page = ->
+
+  #//////////////////////////////////////////////////////////////////////////
+  # Extract URL Vars
+  #//////////////////////////////////////////////////////////////////////////
+
+  # TODO: Make this work for any CATE page
+  CURRENT_URL = document.URL
+  CURRENT_YEAR = CURRENT_URL.match("keyp=([0-9]+)")[1] #TODO: Error check
+  CURRENT_USER = CURRENT_URL.match("[0-9]+:(.*)")[1] # TODO: Error Check
+
+  #//////////////////////////////////////////////////////////////////////////
+  # Extract Details From Page
+  #//////////////////////////////////////////////////////////////////////////
+  version = $("table:first td:first").text()
+
+  profile_image_src = $('table:eq(2) table:eq(1) tr:eq(0) img').attr('src')
+
+  profile_fields = $('table:eq(2) table:eq(1) tr:eq(1) td').map (i, e) -> $(e).text()
+  first_name = profile_fields[0]
+  last_name = profile_fields[1]
+  login = profile_fields[2]
+  category = profile_fields[3]
+  candidate_number = profile_fields[4]
+  cid = profile_fields[5]
+  personal_tutor = profile_fields[6]
+
+  available_years = $("select[name=newyear] option").map (index, elem) ->
+    elem = $(elem)
+    {text: elem.html(), href: elem.attr('value')}
+  available_years = available_years.slice(1)
+
+  other_func_links = $('table:eq(2) table:eq(9) tr td:nth-child(3) a').map (index, elem) ->
+    $(elem).attr("href")
+  grading_schema_link = other_func_links[0]
+  documentation_link = other_func_links[1]
+  extensions_link = other_func_links[2]
+  projects_portal_link = other_func_links[3]
+  individual_records_link = other_func_links[4]
+
+  default_class = $("input[name=class]:checked").val()
+  default_period = $("input[name=period]:checked").val()
+
+  keyt = $("input[type=hidden]").val()
+
+  timetable_url = "/timetable.cgi?period=" + default_period + "&class=" + default_class + "&keyt=" + keyt
+
+  #//////////////////////////////////////////////////////////////////////////
+  # Destroy CATE and Populate
+  #//////////////////////////////////////////////////////////////////////////
+
+  populate_html('body', MAIN_PAGE_HTML)
+
+  $('#cc-version').html(version)
+
+  $('#cc-identity-profile-image').attr('src', profile_image_src)
+  $('#cc-identity-first-name').html(first_name)
+  $('#cc-identity-last-name').html(last_name)
+  $('#cc-identity-login').html(login)
+  $('#cc-identity-category').html(category)
+  $('#cc-identity-candidate-number').html(candidate_number)
+  $('#cc-identity-cid').html(cid)
+  $('#cc-identity-personal-tutor').html(personal_tutor)
+
+  available_years.each (i, val) ->
+    $('#cc-year-dropdown').append '<li><a href="' + val.href + '">' + val.text + '</a></li>'
+
+  $('#nav-exercises').attr('href', timetable_url)
+  $('#nav-grades').attr('href', grading_schema_link)
+
+  $('#cc-other-projects-portal').attr('href', projects_portal_link)
+  $('#cc-other-extensions').attr('href', extensions_link)
+  $('#cc-other-documentation').attr('href', documentation_link)
+  $('#cc-other-grading-schema').attr('href', grading_schema_link)
+
+  $('#cc-keyt').val(keyt)
+  $('#cc-class-select').val(default_class)
+  $('#cc-period-select').val(default_period)
+
+# Reconstruct Main Page
+# TODO: Implement something similar for the other pages/pull in more data
+reconstruct_main_page()

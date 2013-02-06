@@ -22,7 +22,7 @@ get '/classy-cate.js' do
   js = settings.cache.get('classy-cate-js')
   if js.nil?
     logger.info "Caching Classy CATE JS"
-    js = coffee :classy_cate
+    js = coffee(erb(:"classy_cate.coffee"))
     settings.cache.set('classy-cate-js', js)
   end
   js
