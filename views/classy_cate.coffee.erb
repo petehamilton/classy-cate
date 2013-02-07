@@ -322,7 +322,7 @@ initial_load = ->
   else if /student/i.test(current_url)
     window.location = "/#grades"
   else
-    cate_notice = $('<div>Classy CATE hasn\'t been implemented for this page yet<br/><a href="http://www.github.com/peterejhamilton">Implement it!</a></div>')
+    cate_notice = $('<div>Classy CATE hasn\'t been implemented for this page yet<br/><a href="https://github.com/PeterHamilton/classy-cate">Implement it!</a></div>')
     cate_notice.attr('style', 'padding: 20px; margin-bottom: 20px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); border: 3px solid #eed3d7; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #b94a48; background-color: #f2dede; font-size: 18px; text-align: center;')
     $('body').prepend(cate_notice)
 
