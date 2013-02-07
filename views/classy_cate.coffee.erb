@@ -277,10 +277,20 @@ load_grades_page = (e) ->
     populate_grades_page(grade_page_vars)
 
 initial_load = ->
-  main_page_vars = extract_main_page_data($('body'))
-  populate_html('body', LAYOUT_HTML)
-  populate_layout(main_page_vars)
-  load_dashboard_page()
+  current_url = document.URL
+  if /personal/i.test(current_url)
+    hash = (window.location.hash).replace('#', '')
+
+    main_page_vars = extract_main_page_data($('body'))
+    populate_html('body', LAYOUT_HTML)
+    populate_layout(main_page_vars)
+
+    if hash == "grades"
+      load_grades_page()
+    else
+      load_dashboard_page()
+  else if /student/i.test(current_url)
+    window.location = "/#grades"
 
 initial_load()
 
