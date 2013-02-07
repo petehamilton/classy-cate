@@ -218,12 +218,12 @@ populate_grades_page = (vars) ->
     width = switch grade
       when "A*" then 100
       when "A+" then 89
-      when "A" then  79
-      when "B" then  69
-      when "C" then  59
-      when "D" then  49
-      when "E" then  39
-      when "F" then  29
+      when "A"  then 79
+      when "B"  then 69
+      when "C"  then 59
+      when "D"  then 49
+      when "E"  then 39
+      when "F"  then 29
       else 0
     "#{width}%"
 
@@ -250,9 +250,17 @@ populate_grades_page = (vars) ->
         exercise_elem.find('.exercise-declaration').html(exercise.declaration)
         exercise_elem.find('.exercise-extension').html(exercise.extension)
         exercise_elem.find('.exercise-submission').html(exercise.submission)
-        exercise_elem.find('.exercise-grade').html(exercise.grade)
-        exercise_elem.find('.progress').addClass(grade_to_class(exercise.grade))
-        exercise_elem.find('.progress .bar').css('width', grade_to_width(exercise.grade))
+
+        switch exercise.grade
+          when ""
+            exercise_elem.find('.exercise-grade-container').html("No Record")
+          when "n/a"
+            exercise_elem.find('.exercise-grade-container').html("N/A")
+          else
+            exercise_elem.find('.progress').addClass(grade_to_class(exercise.grade))
+            exercise_elem.find('.progress .bar').css('width', grade_to_width(exercise.grade))
+            exercise_elem.find('.exercise-grade').html(exercise.grade)
+
         grades_table.append(exercise_elem)
 
     $('#cc-grade-modules').append(module_elem)
