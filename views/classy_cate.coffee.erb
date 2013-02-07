@@ -6,7 +6,10 @@ LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
 MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page).gsub("\n", "") %>'
 GRADES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :grades_page).gsub("\n", "") %>'
 
-# Helper method to populate an element from escaped HTML
+
+#///////////////////////////////////////////////////////////////////////////////
+# Helper Functions
+#///////////////////////////////////////////////////////////////////////////////
 populate_html = (element, raw) ->
   $(element).html($("<div/>").html(raw).text())
 
@@ -44,6 +47,8 @@ load_cate_page = (url, callback) ->
       frame.remove()
       console.log body.html()
       callback(body)
+
+
 
 #///////////////////////////////////////////////////////////////////////////////
 # Code to extract details from pages
