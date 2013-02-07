@@ -8,6 +8,20 @@ MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page, :layout => :layou
 populate_html = (element, raw) ->
   $(element).html($("<div/>").html(raw).text())
 
+activate_nostalgia = ->
+  nostalgia_colors = ['Teal', 'DarkCyan', 'DeepSkyBlue', 'DarkTurquoise', 'MediumSpringGreen',
+                     'Lime', 'SpringGreen', 'Aqua', 'Cyan', 'MidnightBlue', 'DodgerBlue',
+                     'LightSeaGreen', 'Turquoise', 'RoyalBlue', 'SteelBlue', 'MediumTurquoise',
+                     'CadetBlue', 'CornflowerBlue', 'MediumAquaMarine']
+
+  $('body, footer, div, span, td, input').each (index, elem) ->
+    random_nostalgia_color = nostalgia_colors[Math.floor(Math.random()*nostalgia_colors.length)]
+    $(elem).css('background', random_nostalgia_color)
+
+  $('#old-cate-button').unbind()
+  $('#old-cate-button').bind 'click', ->
+    alert('Nope, you made your bed, now lie in it...')
+
 reconstruct_main_page = ->
 
   #//////////////////////////////////////////////////////////////////////////
@@ -87,6 +101,13 @@ reconstruct_main_page = ->
   $('#cc-keyt').val(keyt)
   $('#cc-class-select').val(default_class)
   $('#cc-period-select').val(default_period)
+
+  #//////////////////////////////////////////////////////////////////////////
+  # Add New Bindings
+  #//////////////////////////////////////////////////////////////////////////
+
+  $('#old-cate-button').bind 'click', activate_nostalgia
+
 
 # Reconstruct Main Page
 # TODO: Implement something similar for the other pages/pull in more data
