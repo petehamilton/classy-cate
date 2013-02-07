@@ -19,21 +19,29 @@ get '/classy-cate.user.js' do
 end
 
 get '/classy-cate.js' do
-  js = settings.cache.get('classy-cate-js')
-  if js.nil?
-    logger.info "Caching Classy CATE JS"
+  begin
+    js = settings.cache.get('classy-cate-js')
+    if js.nil?
+      logger.info "Caching Classy CATE JS"
+      js = coffee(erb(:"classy_cate.coffee"))
+      settings.cache.set('classy-cate-js', js)
+    end
+  rescue Dalli::RingError
     js = coffee(erb(:"classy_cate.coffee"))
-    settings.cache.set('classy-cate-js', js)
   end
   js
 end
 
 get '/classy-cate.css' do
-  css = settings.cache.get('classy-cate-css')
-  if css.nil?
-    logger.info "Caching Classy CATE CSS"
+  begin
+    css = settings.cache.get('classy-cate-css')
+    if css.nil?
+      logger.info "Caching Classy CATE CSS"
+      css = less :classy_cate
+      settings.cache.set('classy-cate-css', css)
+    end
+  rescue Dalli::RingError
     css = less :classy_cate
-    settings.cache.set('classy-cate-css', css)
   end
   css
 end
