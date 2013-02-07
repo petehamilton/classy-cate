@@ -257,6 +257,8 @@ populate_grades_page = (vars) ->
             exercise_elem.find('.exercise-grade-container').html("No Record")
           when "n/a"
             exercise_elem.find('.exercise-grade-container').html("N/A")
+          when "N/P"
+            exercise_elem.find('.exercise-grade-container').html('<i class="icon-lock" />')
           else
             exercise_elem.find('.progress').addClass(grade_to_class(exercise.grade))
             exercise_elem.find('.progress .bar').css('width', grade_to_width(exercise.grade))
