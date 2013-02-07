@@ -241,19 +241,22 @@ populate_grades_page = (vars) ->
     module_elem.find('.module-title').html(module.name)
 
     grades_table = module_elem.find('.module-grades')
-    $(module.exercises).each (i, exercise) ->
-      exercise_elem = $('#exercise_template tr').clone()
-      exercise_elem.find('.exercise-id').html(exercise.id)
-      exercise_elem.find('.exercise-type').html(exercise.type)
-      exercise_elem.find('.exercise-title').html(exercise.title)
-      exercise_elem.find('.exercise-set-by').html(exercise.set_by)
-      exercise_elem.find('.exercise-declaration').html(exercise.declaration)
-      exercise_elem.find('.exercise-extension').html(exercise.extension)
-      exercise_elem.find('.exercise-submission').html(exercise.submission)
-      exercise_elem.find('.exercise-grade').html(exercise.grade)
-      exercise_elem.find('.progress').addClass(grade_to_class(exercise.grade))
-      exercise_elem.find('.progress .bar').css('width', grade_to_width(exercise.grade))
-      grades_table.append(exercise_elem)
+    if module.exercises.length == 0
+      grades_table.append($('<tr><td colspan="8">No exercises for this module.</td></tr>'))
+    else
+      $(module.exercises).each (i, exercise) ->
+        exercise_elem = $('#exercise_template tr').clone()
+        exercise_elem.find('.exercise-id').html(exercise.id)
+        exercise_elem.find('.exercise-type').html(exercise.type)
+        exercise_elem.find('.exercise-title').html(exercise.title)
+        exercise_elem.find('.exercise-set-by').html(exercise.set_by)
+        exercise_elem.find('.exercise-declaration').html(exercise.declaration)
+        exercise_elem.find('.exercise-extension').html(exercise.extension)
+        exercise_elem.find('.exercise-submission').html(exercise.submission)
+        exercise_elem.find('.exercise-grade').html(exercise.grade)
+        exercise_elem.find('.progress').addClass(grade_to_class(exercise.grade))
+        exercise_elem.find('.progress .bar').css('width', grade_to_width(exercise.grade))
+        grades_table.append(exercise_elem)
 
     $('#cc-grade-modules').append(module_elem)
 
