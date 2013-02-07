@@ -32,7 +32,6 @@ text_extract = (html) ->
   html.text().trim().replace(/(\r\n|\n|\r)/gm,"");
 
 load_cate_page = (url, callback) ->
-  console.log "Getting", url
   $.ajax
     type: 'GET'
     url: url
@@ -43,9 +42,7 @@ load_cate_page = (url, callback) ->
       doc = frame.get(0).contentWindow.document
       doc.write(data)
       body = $("body", doc).clone()
-      console.log body.html()
       frame.remove()
-      console.log body.html()
       callback(body)
 
 
@@ -270,9 +267,7 @@ load_dashboard_page = (e) ->
 load_grades_page = (e) ->
   e.preventDefault() if e?
   load_cate_page $('#nav-grades').attr('href'), (body) ->
-    console.log body
     grade_page_vars = extract_grades_page_data(body)
-    console.log grade_page_vars
     populate_html('#page-content', GRADES_PAGE_HTML)
     populate_grades_page(grade_page_vars)
 
