@@ -26,7 +26,7 @@ get '/classy-cate.js' do
       js = coffee(erb(:"classy_cate.coffee"))
       settings.cache.set('classy-cate-js', js)
     end
-  rescue Dalli::RingError
+  rescue *[Dalli::RingError, Dalli::NetworkError]
     js = coffee(erb(:"classy_cate.coffee"))
   end
   js
@@ -40,7 +40,7 @@ get '/classy-cate.css' do
       css = less :classy_cate
       settings.cache.set('classy-cate-css', css)
     end
-  rescue Dalli::RingError
+  rescue *[Dalli::RingError, Dalli::NetworkError]
     css = less :classy_cate
   end
   css
