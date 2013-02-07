@@ -291,9 +291,16 @@ load_grades_page = (e) ->
     populate_html('#page-content', GRADES_PAGE_HTML)
     populate_grades_page(grade_page_vars)
 
+load_css = ->
+  # Let's Bootstrap this shizzle. Files from http://www.bootstrapcdn.com/?v=01282013154951
+  $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
+
 initial_load = ->
   current_url = document.URL
   if /personal/i.test(current_url)
+    load_css()
     hash = (window.location.hash).replace('#', '')
 
     main_page_vars = extract_main_page_data($('body'))

@@ -2,18 +2,12 @@
 // @name         CATE 2.0
 // @author       Pater Hamilton
 // @description  CATE Hurts eyes. This makes it hurt them less.
-// @version 0.1
+// @version 1.0
 // @match https://cate.doc.ic.ac.uk/*
 // ==/UserScript==
 
 function main() {
     console.log("Giving CATE a makeover");
-
-    // Let's Bootstrap this shizzle. Files from http://www.bootstrapcdn.com/?v=01282013154951
-    $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
-    $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
-    $('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
-
     $('head').append('<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>');
     $('head').append('<script type="text/javascript" src="https://classy-cate.herokuapp.com/classy-cate.js"></script>');
 }
