@@ -113,15 +113,6 @@ extract_main_page_data = (html) ->
   }
 
 extract_grades_page_data = (html) ->
-  # TODO: Regex extract useful values
-  subscription_last_updated = text_extract html.find('table:eq(7) table td:eq(1)')
-  submissions_completed = text_extract html.find('table:eq(7) table td:eq(4)')
-  submissions_extended = text_extract html.find('table:eq(7) table td:eq(6)')
-  submissions_late = text_extract html.find('table:eq(7) table td:eq(8)')
-
-  grade_rows = html.find('table:eq(9) table tr')
-  grade_rows = grade_rows.slice(2)
-
   process_header_row = (row) ->
     # TODO: Regex out the fluff
     return {
@@ -144,17 +135,32 @@ extract_grades_page_data = (html) ->
       grade: text_extract row.find('td:eq(7)')
     }
 
-  modules = []
-  current_module = null;
-  grade_rows.each (i, e) ->
-    row_elem = $(e)
-    tds = row_elem.find('td')
-    if tds.length > 1 # Ignore spacer/empty rows
-      if $(tds[0]).attr('colspan')
-        current_module = process_header_row(row_elem)
-        modules.push current_module
-      else
-        current_module.exercises.push process_grade_row(row_elem)
+  extract_modules = (table) ->
+    grade_rows = table.find('tr')
+    grade_rows = grade_rows.slice(2)
+
+    modules = []
+    current_module = null;
+    grade_rows.each (i, e) ->
+      row_elem = $(e)
+      tds = row_elem.find('td')
+      if tds.length > 1 # Ignore spacer/empty rows
+        if $(tds[0]).attr('colspan')
+          current_module = process_header_row(row_elem)
+          modules.push current_module
+        else
+          current_module.exercises.push process_grade_row(row_elem)
+
+    return modules
+
+  # TODO: Regex extract useful values
+  subscription_last_updated = text_extract html.find('table:eq(7) table td:eq(1)')
+  submissions_completed = text_extract html.find('table:eq(7) table td:eq(4)')
+  submissions_extended = text_extract html.find('table:eq(7) table td:eq(6)')
+  submissions_late = text_extract html.find('table:eq(7) table td:eq(8)')
+
+  required_modules = extract_modules html.find('table:eq(9)')
+  optional_modules = extract_modules html.find('table:eq(11)')
 
   return {
     stats:
@@ -162,7 +168,8 @@ extract_grades_page_data = (html) ->
       submissions_completed: submissions_completed
       submissions_extended: submissions_extended
       submissions_late: submissions_late
-    modules: modules
+    required_modules: required_modules
+    optional_modules: optional_modules
   }
 
 
@@ -227,13 +234,7 @@ populate_grades_page = (vars) ->
       else 0
     "#{width}%"
 
-
-  $('#cc-subscription-updated').html(vars.stats.subscription_last_updated)
-  $('#cc-submissions-completed').html(vars.stats.submissions_completed)
-  $('#cc-submissions-extended').html(vars.stats.submissions_extended)
-  $('#cc-submissions-late').html(vars.stats.submissions_late)
-
-  $(vars.modules).each (i, module) ->
+  render_module = (module) ->
     module_elem = $('#module_template .row').clone()
     module_elem.find('.module-title').html(module.name)
 
@@ -260,10 +261,19 @@ populate_grades_page = (vars) ->
             exercise_elem.find('.progress').addClass(grade_to_class(exercise.grade))
             exercise_elem.find('.progress .bar').css('width', grade_to_width(exercise.grade))
             exercise_elem.find('.exercise-grade').html(exercise.grade)
-
         grades_table.append(exercise_elem)
+    return module_elem
 
-    $('#cc-grade-modules').append(module_elem)
+  $('#cc-subscription-updated').html(vars.stats.subscription_last_updated)
+  $('#cc-submissions-completed').html(vars.stats.submissions_completed)
+  $('#cc-submissions-extended').html(vars.stats.submissions_extended)
+  $('#cc-submissions-late').html(vars.stats.submissions_late)
+
+  $(vars.required_modules).each (i, module) ->
+    $('#cc-required-modules').append(render_module module)
+
+  $(vars.optional_modules).each (i, module) ->
+    $('#cc-optional-modules').append(render_module module)
 
 load_dashboard_page = (e) ->
   e.preventDefault() if e?

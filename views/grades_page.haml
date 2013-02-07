@@ -31,14 +31,20 @@
       %td
         %span.exercise-submission
       %td{:style => "min-width: 100px"}
-        .progress
-          .bar
-            .exercise-grade
+        .exercise-grade-container
+          .progress
+            .bar
+              .exercise-grade
 
 .row
   .span12
-    %h2 Grades
-    #cc-grade-modules
+    %h2 Grades for Required Modules
+    #cc-required-modules
+
+.row
+  .span12
+    %h2 Grades for Optional Modules
+    #cc-optional-modules
 
 .row
   .span6
