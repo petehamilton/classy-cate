@@ -5,7 +5,7 @@
 LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
 MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page).gsub("\n", "") %>'
 GRADES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :grades_page).gsub("\n", "") %>'
-CLASSY_CATE_VERSION = "1.0"
+CLASSY_CATE_SCRIPT_VERSION = "1.1"
 
 #///////////////////////////////////////////////////////////////////////////////
 # Helper Functions
@@ -183,13 +183,13 @@ populate_layout = (vars) ->
   $('#nav-grades').attr('href', vars.individual_records_link)
   $('#cc-current-year').html("(#{vars.current_year})")
 
-  if window.classy_cate_version != CLASSY_CATE_VERSION
+  if window.classy_cate_script_version != CLASSY_CATE_SCRIPT_VERSION
     $('#page-content').before('<div class="alert alert-error">' +
                                   'Your Classy-CATE script is out of date! ' +
                                   '<a href="http://classy-cate.herokuapp.com/classy-cate.user.js">' +
                                     'Click Here'+
                                   '</a>' +
-                                  ' to update to CCv' + CLASSY_CATE_VERSION + '</a>')
+                                  ' to update to CCv' + CLASSY_CATE_SCRIPT_VERSION + '</a>')
 
   # New Bindings
   $('#nav-dashboard').bind 'click', load_dashboard_page
