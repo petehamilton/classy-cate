@@ -8,7 +8,7 @@ MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page, :layout => :layou
 populate_html = (element, raw) ->
   $(element).html($("<div/>").html(raw).text())
 
-activate_nostalgia = ->
+activate_nostalgia_mode = ->
   nostalgia_colors = ['Teal', 'DarkCyan', 'DeepSkyBlue', 'DarkTurquoise', 'MediumSpringGreen',
                      'Lime', 'SpringGreen', 'Aqua', 'Cyan', 'MidnightBlue', 'DodgerBlue',
                      'LightSeaGreen', 'Turquoise', 'RoyalBlue', 'SteelBlue', 'MediumTurquoise',
@@ -106,7 +106,7 @@ reconstruct_main_page = ->
   # Add New Bindings
   #//////////////////////////////////////////////////////////////////////////
 
-  $('#old-cate-button').bind 'click', activate_nostalgia
+  $('#old-cate-button').bind 'click', activate_nostalgia_mode
 
 
 # Reconstruct Main Page
