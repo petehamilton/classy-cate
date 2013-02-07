@@ -2,7 +2,8 @@
 # TODO: Move sections out into functions. Originally this wasn't possible,
 #       hence the ugly all-in-one-function implementation below
 
-MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page, :layout => :layout).gsub("\n", "") %>'
+LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
+MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page).gsub("\n", "") %>'
 
 # Helper method to populate an element from escaped HTML
 populate_html = (element, raw) ->
@@ -23,25 +24,19 @@ activate_nostalgia_mode = ->
   $('#old-cate-button').bind 'click', ->
     alert('Nope, you made your bed, now lie in it...')
 
-reconstruct_main_page = ->
 
-  #//////////////////////////////////////////////////////////////////////////
-  # Extract URL Vars
-  #//////////////////////////////////////////////////////////////////////////
-
-  # TODO: Make this work for any CATE page
+#//////////////////////////////////////////////////////////////////////////
+# Extract Details From Page
+#//////////////////////////////////////////////////////////////////////////
+extract_main_page_data = (html) ->
   current_url = document.URL
   current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check
   current_user = current_url.match("[0-9]+:(.*)")[1] # TODO: Error Check
+  version = html.find('table:first td:first').text()
 
-  #//////////////////////////////////////////////////////////////////////////
-  # Extract Details From Page
-  #//////////////////////////////////////////////////////////////////////////
-  version = $("table:first td:first").text()
+  profile_image_src = html.find('table:eq(2) table:eq(1) tr:eq(0) img').attr('src')
 
-  profile_image_src = $('table:eq(2) table:eq(1) tr:eq(0) img').attr('src')
-
-  profile_fields = $('table:eq(2) table:eq(1) tr:eq(1) td').map (i, e) -> $(e).text()
+  profile_fields = html.find('table:eq(2) table:eq(1) tr:eq(1) td').map (i, e) -> $(e).text()
   first_name = profile_fields[0]
   last_name = profile_fields[1]
   login = profile_fields[2]
@@ -50,66 +45,88 @@ reconstruct_main_page = ->
   cid = profile_fields[5]
   personal_tutor = profile_fields[6]
 
-  available_years = $("select[name=newyear] option").map (index, elem) ->
+  available_years = html.find('select[name=newyear] option').map (index, elem) ->
     elem = $(elem)
     {text: elem.html(), href: elem.attr('value')}
   available_years = available_years.slice(1)
 
-  other_func_links = $('table:eq(2) table:eq(9) tr td:nth-child(3) a').map (index, elem) ->
-    $(elem).attr("href")
+  other_func_links = html.find('table:eq(2) table:eq(9) tr td:nth-child(3) a').map (index, elem) ->
+    $(elem).attr('href')
   grading_schema_link = other_func_links[0]
   documentation_link = other_func_links[1]
   extensions_link = other_func_links[2]
   projects_portal_link = other_func_links[3]
   individual_records_link = other_func_links[4]
 
-  default_class = $("input[name=class]:checked").val()
-  default_period = $("input[name=period]:checked").val()
+  default_class = html.find('input[name=class]:checked').val()
+  default_period = html.find('input[name=period]:checked').val()
 
-  keyt = $("input[type=hidden]").val()
+  keyt = html.find('input[type=hidden]').val()
 
-  timetable_url = "/timetable.cgi?period=" + default_period + "&class=" + default_class + "&keyt=" + keyt
+  timetable_url = '/timetable.cgi?period=' + default_period + '&class=' + default_class + '&keyt=' + keyt
 
-  #//////////////////////////////////////////////////////////////////////////
-  # Destroy CATE and Populate
-  #//////////////////////////////////////////////////////////////////////////
+  return {
+    current_url: current_url
+    current_year: current_year
+    current_user: current_user
+    version: version
+    profile_image_src: profile_image_src
+    first_name: first_name
+    last_name: last_name
+    login: login
+    category: category
+    candidate_number: candidate_number
+    cid: cid
+    personal_tutor: personal_tutor
+    available_years: available_years
+    grading_schema_link: grading_schema_link
+    documentation_link: documentation_link
+    extensions_link: extensions_link
+    projects_portal_link: projects_portal_link
+    individual_records_link: individual_records_link
+    default_class: default_class
+    default_period: default_period
+    keyt: keyt
+    timetable_url: timetable_url
+  }
 
-  populate_html('body', MAIN_PAGE_HTML)
+construct_layout = (vars) ->
+  populate_html('body', LAYOUT_HTML)
 
-  $('#cc-version').html(version)
-  $('#nav-exercises').attr('href', timetable_url)
-  $('#nav-grades').attr('href', grading_schema_link)
-  $('#cc-current-year').html("(#{current_year})")
+  $('#cc-version').html(vars.version)
+  $('#nav-exercises').attr('href', vars.timetable_url)
+  $('#nav-grades').attr('href', vars.grading_schema_link)
+  $('#cc-current-year').html("(#{vars.current_year})")
 
-  $('#cc-identity-profile-image').attr('src', profile_image_src)
-  $('#cc-identity-first-name').html(first_name)
-  $('#cc-identity-last-name').html(last_name)
-  $('#cc-identity-login').html(login)
-  $('#cc-identity-category').html(category)
-  $('#cc-identity-candidate-number').html(candidate_number)
-  $('#cc-identity-cid').html(cid)
-  $('#cc-identity-personal-tutor').html(personal_tutor)
+construct_main_page = (vars) ->
+  populate_html('#main-page-content', MAIN_PAGE_HTML)
 
-  available_years.each (i, val) ->
+  $('#cc-identity-profile-image').attr('src', vars.profile_image_src)
+  $('#cc-identity-first-name').html(vars.first_name)
+  $('#cc-identity-last-name').html(vars.last_name)
+  $('#cc-identity-login').html(vars.login)
+  $('#cc-identity-category').html(vars.category)
+  $('#cc-identity-candidate-number').html(vars.candidate_number)
+  $('#cc-identity-cid').html(vars.cid)
+  $('#cc-identity-personal-tutor').html(vars.personal_tutor)
+
+  vars.available_years.each (i, val) ->
     $('#cc-year-dropdown').append '<li><a href="' + val.href + '">' + val.text + '</a></li>'
 
+  $('#cc-other-projects-portal').attr('href', vars.projects_portal_link)
+  $('#cc-other-extensions').attr('href', vars.extensions_link)
+  $('#cc-other-documentation').attr('href', vars.documentation_link)
+  $('#cc-other-grading-schema').attr('href', vars.grading_schema_link)
 
-  $('#cc-other-projects-portal').attr('href', projects_portal_link)
-  $('#cc-other-extensions').attr('href', extensions_link)
-  $('#cc-other-documentation').attr('href', documentation_link)
-  $('#cc-other-grading-schema').attr('href', grading_schema_link)
+  $('#cc-keyt').val(vars.keyt)
+  $('#cc-class-select').val(vars.default_class)
+  $('#cc-period-select').val(vars.default_period)
 
-  $('#cc-keyt').val(keyt)
-  $('#cc-class-select').val(default_class)
-  $('#cc-period-select').val(default_period)
-
-  #//////////////////////////////////////////////////////////////////////////
-  # Add New Bindings
-  #//////////////////////////////////////////////////////////////////////////
-
+  # New Bindings
   $('#old-cate-button').bind 'click', activate_nostalgia_mode
-
 
 # Reconstruct Main Page
 # TODO: Implement something similar for the other pages/pull in more data
-reconstruct_main_page()
+main_page_vars = extract_main_page_data($('body'))
+construct_layout(main_page_vars)
+construct_main_page(main_page_vars)
