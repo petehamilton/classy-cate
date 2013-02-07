@@ -277,6 +277,7 @@ populate_grades_page = (vars) ->
 
 load_dashboard_page = (e) ->
   e.preventDefault() if e?
+  window.location.hash = "dashboard"
   load_cate_page $('#nav-dashboard').attr('href'), (body) ->
     main_page_vars = extract_main_page_data(body)
     populate_html('#page-content', MAIN_PAGE_HTML)
@@ -284,6 +285,7 @@ load_dashboard_page = (e) ->
 
 load_grades_page = (e) ->
   e.preventDefault() if e?
+  window.location.hash = "grades"
   load_cate_page $('#nav-grades').attr('href'), (body) ->
     grade_page_vars = extract_grades_page_data(body)
     populate_html('#page-content', GRADES_PAGE_HTML)
