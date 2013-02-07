@@ -4,6 +4,7 @@
 
 LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
 MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page).gsub("\n", "") %>'
+GRADES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :grades_page).gsub("\n", "") %>'
 
 # Helper method to populate an element from escaped HTML
 populate_html = (element, raw) ->
@@ -24,10 +25,29 @@ activate_nostalgia_mode = ->
   $('#old-cate-button').bind 'click', ->
     alert('Nope, you made your bed, now lie in it...')
 
+text_extract = (html) ->
+  html.text().trim().replace(/(\r\n|\n|\r)/gm,"");
 
-#//////////////////////////////////////////////////////////////////////////
-# Extract Details From Page
-#//////////////////////////////////////////////////////////////////////////
+load_cate_page = (url, callback) ->
+  console.log "Getting", url
+  $.ajax
+    type: 'GET'
+    url: url
+    dataType: 'html'
+    success: (data) ->
+      frame = $('<iframe class="hidden" src="about:blank"/>').hide()
+      frame.appendTo('body')
+      doc = frame.get(0).contentWindow.document
+      doc.write(data)
+      body = $("body", doc).clone()
+      console.log body.html()
+      frame.remove()
+      console.log body.html()
+      callback(body)
+
+#///////////////////////////////////////////////////////////////////////////////
+# Code to extract details from pages
+#///////////////////////////////////////////////////////////////////////////////
 extract_main_page_data = (html) ->
   current_url = document.URL
   current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check
@@ -90,17 +110,75 @@ extract_main_page_data = (html) ->
     timetable_url: timetable_url
   }
 
-construct_layout = (vars) ->
-  populate_html('body', LAYOUT_HTML)
+extract_grades_page_data = (html) ->
+  # TODO: Regex extract useful values
+  subscription_last_updated = text_extract html.find('table:eq(7) table td:eq(1)')
+  submissions_completed = text_extract html.find('table:eq(7) table td:eq(4)')
+  submissions_extended = text_extract html.find('table:eq(7) table td:eq(6)')
+  submissions_late = text_extract html.find('table:eq(7) table td:eq(8)')
 
+  grade_rows = html.find('table:eq(9) table tr')
+  grade_rows = grade_rows.slice(2)
+
+  process_header_row = (row) ->
+    # TODO: Regex out the fluff
+    return {
+      name: text_extract row.find('td:eq(0)')
+      term: text_extract row.find('td:eq(1)')
+      submission: text_extract row.find('td:eq(2)')
+      level: text_extract row.find('td:eq(3)')
+      exercises: []
+    }
+
+  process_grade_row = (row) ->
+    return {
+      id: parseInt(text_extract row.find('td:eq(0)'))
+      type: text_extract row.find('td:eq(1)')
+      title: text_extract row.find('td:eq(2)')
+      set_by: text_extract row.find('td:eq(3)')
+      declaration: text_extract row.find('td:eq(4)')
+      extension: text_extract row.find('td:eq(5)')
+      submission: text_extract row.find('td:eq(6)')
+      grade: text_extract row.find('td:eq(7)')
+    }
+
+  modules = []
+  current_module = null;
+  grade_rows.each (i, e) ->
+    row_elem = $(e)
+    tds = row_elem.find('td')
+    if tds.length > 1 # Ignore spacer/empty rows
+      if $(tds[0]).attr('colspan')
+        current_module = process_header_row(row_elem)
+        modules.push current_module
+      else
+        current_module.exercises.push process_grade_row(row_elem)
+
+  return {
+    stats:
+      subscription_last_updated: subscription_last_updated
+      submissions_completed: submissions_completed
+      submissions_extended: submissions_extended
+      submissions_late: submissions_late
+    modules: modules
+  }
+
+
+#///////////////////////////////////////////////////////////////////////////////
+# Code to construct the new layouts
+#///////////////////////////////////////////////////////////////////////////////
+populate_layout = (vars) ->
   $('#cc-version').html(vars.version)
+  $('#nav-dashboard').attr('href', vars.current_url)
   $('#nav-exercises').attr('href', vars.timetable_url)
   $('#nav-grades').attr('href', vars.individual_records_link)
   $('#cc-current-year').html("(#{vars.current_year})")
 
-construct_main_page = (vars) ->
-  populate_html('#main-page-content', MAIN_PAGE_HTML)
+  # New Bindings
+  $('#nav-dashboard').bind 'click', load_dashboard_page
+  $('#nav-grades').bind 'click', load_grades_page
 
+populate_main_page = (vars) ->
   $('#cc-identity-profile-image').attr('src', vars.profile_image_src)
   $('#cc-identity-first-name').html(vars.first_name)
   $('#cc-identity-last-name').html(vars.last_name)
@@ -125,8 +203,76 @@ construct_main_page = (vars) ->
   # New Bindings
   $('#old-cate-button').bind 'click', activate_nostalgia_mode
 
-# Reconstruct Main Page
-# TODO: Implement something similar for the other pages/pull in more data
-main_page_vars = extract_main_page_data($('body'))
-construct_layout(main_page_vars)
-construct_main_page(main_page_vars)
+populate_grades_page = (vars) ->
+
+  grade_to_class = (grade) ->
+    switch grade
+      when "A*", "A+", "A" then "progress-success"
+      when "B"  then "progress-info"
+      when "C" then "progress-warning"
+      when "D", "E", "F" then "progress-danger"
+
+  grade_to_width = (grade) ->
+    width = switch grade
+      when "A*" then 100
+      when "A+" then 89
+      when "A" then  79
+      when "B" then  69
+      when "C" then  59
+      when "D" then  49
+      when "E" then  39
+      when "F" then  29
+      else 0
+    "#{width}%"
+
+
+  $('#cc-subscription-updated').html(vars.stats.subscription_last_updated)
+  $('#cc-submissions-completed').html(vars.stats.submissions_completed)
+  $('#cc-submissions-extended').html(vars.stats.submissions_extended)
+  $('#cc-submissions-late').html(vars.stats.submissions_late)
+
+  $(vars.modules).each (i, module) ->
+    module_elem = $('#module_template .row').clone()
+    module_elem.find('.module-title').html(module.name)
+
+    grades_table = module_elem.find('.module-grades')
+    $(module.exercises).each (i, exercise) ->
+      exercise_elem = $('#exercise_template tr').clone()
+      exercise_elem.find('.exercise-id').html(exercise.id)
+      exercise_elem.find('.exercise-type').html(exercise.type)
+      exercise_elem.find('.exercise-title').html(exercise.title)
+      exercise_elem.find('.exercise-set-by').html(exercise.set_by)
+      exercise_elem.find('.exercise-declaration').html(exercise.declaration)
+      exercise_elem.find('.exercise-extension').html(exercise.extension)
+      exercise_elem.find('.exercise-submission').html(exercise.submission)
+      exercise_elem.find('.exercise-grade').html(exercise.grade)
+      exercise_elem.find('.progress').addClass(grade_to_class(exercise.grade))
+      exercise_elem.find('.progress .bar').css('width', grade_to_width(exercise.grade))
+      grades_table.append(exercise_elem)
+
+    $('#cc-grade-modules').append(module_elem)
+
+load_dashboard_page = (e) ->
+  e.preventDefault() if e?
+  load_cate_page $('#nav-dashboard').attr('href'), (body) ->
+    main_page_vars = extract_main_page_data(body)
+    populate_html('#page-content', MAIN_PAGE_HTML)
+    populate_main_page(main_page_vars)
+
+load_grades_page = (e) ->
+  e.preventDefault() if e?
+  load_cate_page $('#nav-grades').attr('href'), (body) ->
+    console.log body
+    grade_page_vars = extract_grades_page_data(body)
+    console.log grade_page_vars
+    populate_html('#page-content', GRADES_PAGE_HTML)
+    populate_grades_page(grade_page_vars)
+
+initial_load = ->
+  main_page_vars = extract_main_page_data($('body'))
+  populate_html('body', LAYOUT_HTML)
+  populate_layout(main_page_vars)
+  load_dashboard_page()
+
+initial_load()
+

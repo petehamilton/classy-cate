@@ -13,6 +13,8 @@
         .nav-collapse.collapse
           %ul.nav
             %li
+              %a#nav-dashboard{:href => "#"} Dashboard
+            %li
               %a#nav-exercises{:href => "#"} Exercises
             %li
               %a#nav-grades{:href => "#"} Grades
@@ -27,7 +29,8 @@
                 %span Change Year
                 %b.caret
               %ul#cc-year-dropdown.dropdown-menu{:role => "menu"}
-  #main-page-content
+  #page-content
+
 %footer.footer
   .container
     %p
