@@ -186,6 +186,7 @@ populate_layout = (vars) ->
   # New Bindings
   $('#nav-dashboard').bind 'click', load_dashboard_page
   $('#nav-grades').bind 'click', load_grades_page
+  $('#old-cate-button').bind 'click', activate_nostalgia_mode
 
 populate_main_page = (vars) ->
   $('#cc-identity-profile-image').attr('src', vars.profile_image_src)
@@ -208,9 +209,6 @@ populate_main_page = (vars) ->
   $('#cc-keyt').val(vars.keyt)
   $('#cc-class-select').val(vars.default_class)
   $('#cc-period-select').val(vars.default_period)
-
-  # New Bindings
-  $('#old-cate-button').bind 'click', activate_nostalgia_mode
 
 populate_grades_page = (vars) ->
 
