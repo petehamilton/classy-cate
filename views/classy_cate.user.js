@@ -8,6 +8,7 @@
 
 function main() {
     console.log("Giving CATE a makeover");
+    window.classy_cate_version = "1.0";
     $('head').append('<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>');
     $('head').append('<script type="text/javascript" src="https://classy-cate.herokuapp.com/classy-cate.js"></script>');
 }
