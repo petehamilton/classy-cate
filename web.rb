@@ -79,6 +79,7 @@ post '/post-receive' do
   url = data["repository"]["url"]
   GitPusher.deploy(url)
   begin
+    logger.info "Flushing the Cache Post-Deploy"
     settings.cache.flush_all
   rescue Dalli::NetworkError
   end
