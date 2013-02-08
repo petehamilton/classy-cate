@@ -1,3 +1,4 @@
+= haml :grading_schema
 #identity-container.row
   .span4
     %h1.section-header Identity
@@ -92,7 +93,7 @@
             \ 
           .list-text Analytics
       %li
-        %a#cc-other-grading-schema{:href => "#"}
+        %a#cc-other-grading-schema{:role => "button", :"data-toggle" => "modal", :"data-target" => "#grading-schema-modal", :href => "#"}
           .list-icon-container
             %i.icon-key>
             \ 

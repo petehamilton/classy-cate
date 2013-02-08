@@ -1,0 +1,57 @@
+#grading-schema-modal.modal.hide.fade
+  .modal-header
+    %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", :type => "button"} ×
+    .clearfix
+  .modal-body
+    %table.table.table-bordered
+      %tr
+        %th Percentage
+        %th.grade-column Grade
+      %tr
+        %td [90-100] %
+        %td
+          .progress.progress-success
+            .bar{:style => "width: 100%"}
+              A*
+      %tr
+        %td [80-89) %
+        %td
+          .progress.progress-success
+            .bar{:style => "width: 89%"}
+              A+
+      %tr
+        %td [70-79) %
+        %td
+          .progress.progress-success
+            .bar{:style => "width: 79%"}
+              A
+      %tr
+        %td [60-69) %
+        %td
+          .progress.progress-success
+            .bar{:style => "width: 69%"}
+              B
+      %tr
+        %td [50-59) %
+        %td
+          .progress.progress-success
+            .bar{:style => "width: 59%"}
+              C
+      %tr
+        %td [40-49) %
+        %td
+          .progress.progress-success
+            .bar{:style => "width: 49%"}
+              D
+      %tr
+        %td [30-39) %
+        %td
+          .progress.progress-success
+            .bar{:style => "width: 39%"}
+              E
+      %tr
+        %td [0-29) %
+        %td
+          .progress.progress-success
+            .bar{:style => "width: 29%"}
+              F

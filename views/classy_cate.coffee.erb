@@ -5,6 +5,7 @@
 LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
 MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page).gsub("\n", "") %>'
 GRADES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :grades_page).gsub("\n", "") %>'
+
 CLASSY_CATE_SCRIPT_VERSION = "1.1"
 
 #///////////////////////////////////////////////////////////////////////////////
@@ -41,10 +42,9 @@ load_cate_page = (url, callback) ->
       frame.appendTo('body')
       doc = frame.get(0).contentWindow.document
       doc.write(data)
-      body = $("body", doc).clone()
+      body = $('body', doc).clone()
       frame.remove()
       callback(body)
-
 
 
 #///////////////////////////////////////////////////////////////////////////////
@@ -54,6 +54,7 @@ extract_main_page_data = (html) ->
   current_url = document.URL
   current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check
   current_user = current_url.match("[0-9]+:(.*)")[1] # TODO: Error Check
+
   version = html.find('table:first td:first').text()
 
   profile_image_src = html.find('table:eq(2) table:eq(1) tr:eq(0) img').attr('src')
@@ -74,6 +75,7 @@ extract_main_page_data = (html) ->
 
   other_func_links = html.find('table:eq(2) table:eq(9) tr td:nth-child(3) a').map (index, elem) ->
     $(elem).attr('href')
+
   grading_schema_link = other_func_links[0]
   documentation_link = other_func_links[1]
   extensions_link = other_func_links[2]
@@ -212,7 +214,6 @@ populate_main_page = (vars) ->
   $('#cc-other-projects-portal').attr('href', vars.projects_portal_link)
   $('#cc-other-extensions').attr('href', vars.extensions_link)
   $('#cc-other-documentation').attr('href', vars.documentation_link)
-  $('#cc-other-grading-schema').attr('href', vars.grading_schema_link)
 
   $('#cc-keyt').val(vars.keyt)
   $('#cc-class-select').val(vars.default_class)
@@ -286,7 +287,10 @@ populate_grades_page = (vars) ->
 load_dashboard_page = (e) ->
   e.preventDefault() if e?
   window.location.hash = "dashboard"
-  load_cate_page $('#nav-dashboard').attr('href'), (body) ->
+  url = $('#nav-dashboard').attr('href')
+  console.log url
+  load_cate_page url, (body) ->
+    console.log body
     main_page_vars = extract_main_page_data(body)
     populate_html('#page-content', MAIN_PAGE_HTML)
     populate_main_page(main_page_vars)
