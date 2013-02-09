@@ -6,7 +6,15 @@ CATE, without ~~the~~ as much hurt.
 
 
 ## Installation
-Install `http://classy-cate.herokuapp.com/classy-cate.user.js` as a Userscript in [Chrome](https://www.google.com/intl/en/chrome/browser/) or use [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) in firefox.
+  - [Chrome](https://www.google.com/intl/en/chrome/browser/)
+    - Install [TamperMonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en)
+    - Visit http://classy-cate.herokuapp.com/classy-cate.user.js
+    - Agree/Install
+    - Alternatively, install it as a Chrome user script
+  - [Firefox](http://www.mozilla.org/en-US/firefox/new/)
+    - Install [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)
+    - Visit http://classy-cate.herokuapp.com/classy-cate.user.js
+    - Agree/Install
 
 - TamperMonkey is a great chrome extension for this. (Thanks to @vahokif)
 - [Allow Third party Chrome Scripts](http://solidsprite.com/2012/08/how-to-install-third-party-userscripts-in-chrome-mac-os-x/)
