@@ -162,7 +162,7 @@ extract_grades_page_data = (html) ->
   submissions_late = text_extract html.find('table:eq(7) table td:eq(8)')
 
   required_modules = extract_modules html.find('table:eq(9)')
-  optional_modules = extract_modules html.find('table:eq(11)')
+  optional_modules = extract_modules html.find('table:eq(-2)')
 
   return {
     stats:
