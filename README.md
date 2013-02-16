@@ -23,10 +23,8 @@ CATE, without ~~the~~ as much hurt.
 ## Rough TODO List (Please Help)
 
 - **Timetable page**
-- **Grades Page**
 - Scrub last vestige of CATE from homepage - the favicon! Use [this](http://stackoverflow.com/questions/260857/changing-website-favicon-dynamically/260876#260876)
 - Non-Undergrads may experience missing/broken links. I have no idea.
-- Refactor code in functions (couldn't until now)
 
 ## Ideas
 
