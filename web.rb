@@ -7,7 +7,7 @@ require 'less'
 require 'dalli'
 
 # Default 10 minute cache
-set :cache, Dalli::Client.new(nil, {:expires_in => 60*10})
+set :cache, Dalli::Client.new(nil, {:expires_in => 60*60*24})
 
 get '/' do
   redirect "https://github.com/PeterHamilton/classy-cate#classy-cate"
