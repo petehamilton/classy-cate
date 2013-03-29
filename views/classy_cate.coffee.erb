@@ -361,7 +361,10 @@ populate_exercises_page = (vars) ->
   modules = vars.modules
   $('#term_title').text('Timetable - ' + vars.term_title)
   for module in (m for m in modules when m.exercises[0]?)
-    destDiv.append('<h3>' + module.id + ' - ' + module.name + '</h3>')
+    moduleHeader = $('<h3>' + module.id + ' - ' + module.name + ' - </h3>')
+    $(document.createElement('a')).attr('href',module.notesLink).html('Notes')
+      .appendTo(moduleHeader)
+    destDiv.append(moduleHeader)
       .append(moduleTable = $('#exercises_template').clone().removeClass('hidden'))
     moduleTable.css('width','100%')
     for ex in module.exercises
@@ -486,6 +489,7 @@ load_css = ->
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
   $('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="http://localhost:4567/classy-cate.css" type="text/css" />');
 
 
 initial_load = ->
