@@ -1,0 +1,26 @@
+.timelineContainer .infoBox {
+	position : absolute; 
+	text-align : left; 
+	white-space : nowrap;
+	font-family : 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	border-radius: 4px;
+	padding : 2px;
+	border-color : #636363; font-size : 10px; border-width:1px;
+	border-style : solid; z-index : 30; overflow : hidden;
+	-moz-box-shadow: 0 0 3px grey; box-shadow : 0 0 3px grey;
+	-webkit-box-shadow : 0 0 3px grey;
+	cursor : pointer;
+	background-color : #fcfcfc; height: auto; width : auto;
+}
+.timelineContainer .infoBox:hover {
+	-moz-box-shadow: 0 0 5px grey; box-shadow : 0 0 5px grey;
+	-webkit-box-shadow : 0 0 5px grey;
+}
+
+.timelineContainer .infoBox a {
+	font-weight : bold;
+}
+
+.timelineContainer .infoBox .title {
+	font-weight: bold;
+}
