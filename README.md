@@ -38,12 +38,9 @@ CATE, without ~~the~~ as much hurt.
 
 To develop and help improve classy-cate, do the following:
 
-1. Run the server with `shotgun -p 4567 web.rb`
-2. Add whatever other local server assets you wish to the
-   classy_cate.user_testing.js file
-3. Install your modified `classy-cate.user.js` as an Userscript/Greasemonkey extension in Chrome/Firefox.
-4. Modify `views/classy_cate.coffee.erb` and `views/classy_cate.less` to
-   add/modify functionality as you wish!
+1. Run the server with `thin start -p 4567 --ssl`
+2. Modify `classy-cate.user.js` to point to your local server assets
+3. Modify `views/classy_cate.coffee.erb` and `views/classy_cate.less` to add/modify functionality as you wish!
 
 ## Want to help, but don't have a clue?
 
