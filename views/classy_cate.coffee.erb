@@ -421,8 +421,12 @@ populate_exercises_page = (vars) ->
   $('#term_title').text('Timetable - ' + vars.term_title)
 
   for module in (m for m in modules when m.exercises[0]?) # Ignore empty modules
-    module_header = $('<h3>' + module.id + ' - ' + module.name + ' - </h3>')
-    $('<a/>').attr('href', module.notesLink).html('Notes').appendTo(module_header)
+    module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>')
+    
+    if module.notesLink?
+      module_header.text(module_header.text() + " - ")
+      $('<a/>').attr('href', module.notesLink).html('Notes').appendTo(module_header)
+
     module_table = $('#exercises_template').clone().removeClass('hidden').css('width','100%')
     for exercise in module.exercises
       row = $('#exercise_row_template').clone()
