@@ -434,6 +434,11 @@ populate_exercises_page = (vars) ->
       populate_exercise_row row, exercise
     destination_div.append(module_header).append(module_table)
 
+  $('#back_term_btn').bind 'click', ->
+      load_exercises_page null, null, -1
+  $('#next_term_btn').bind 'click', ->
+      load_exercises_page null, null, 1
+
 
 populate_grades_page = (vars) ->
 
@@ -517,18 +522,34 @@ load_grades_page = (e) ->
     populate_html('#page-content', GRADES_PAGE_HTML)
     populate_grades_page(grade_page_vars)
 
-load_exercises_page = (e, fallback) ->
+load_exercises_page = (e, fallback, shifting) ->
+
+  get_period_from_href = (href) ->
+    parseInt href.split('period=')[1][0]
+
+  alter_href_by = (href, i) ->
+    p = (get_period_from_href href)
+    href.replace(('period=' + p),('period=' + (p + i)))
+
+  isHoliday = (period) -> period%2 == 0
+
   e.preventDefault() if e?
   window.location.hash = "timetable"
+
   href = $('#nav-exercises').attr('href')
-  period = parseInt href.split('period=')[1][0]
-  if fallback?
-    href = href.replace(('period=' + period),('period=' + (period - 1)))
-  isHoliday = (period) -> period%2 == 0
+  if shifting?
+    href = alter_href_by window.location.href, shifting
+  else if fallback?
+    href = alter_href_by href, (-1)
+
   load_cate_page href, (body) ->
     exercise_page_vars = extract_exercise_page_data body
     go_forth_and_multiply = true
-    if isHoliday(period)
+    if shifting?
+      href = alter_href_by href, shifting
+      load_exercises_page e, null, null
+      go_forth_and_multiply = false
+    else if isHoliday(get_period_from_href href)
       noOfExercises = 0
       noOfExercises += 
         (if m.exs? then m.exs.length else 0) for m in exercise_page_vars.modules
