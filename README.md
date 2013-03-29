@@ -77,9 +77,11 @@ Rails is a ruby gem that serves up site assets given certain url
 requests. If you look inside the web.rb file at the root of the
 directory then you should find lots of things like::
 
+```ruby
     get '/classy-cate.user.js' do
         send_file('views/classy_cate.user.js')
     end
+```
 
 All this says is on the server being asked for the address
 `server_location/classy-cate.user.js`, deliver the file
@@ -88,6 +90,7 @@ the next question is.
 
 ### What the hell is this?::
 
+```ruby
     get '/classy-cate.js' do
         begin
             js = settings.cache.get('classy-cate-js')
@@ -100,7 +103,8 @@ the next question is.
                 js = coffee(erb(:"classy_cate.coffee"))
         end
         js
-    end
+    end 
+```
 
 Well this looks a bit worse than that piece did. The real source of
 confusion here for most is going to be that classy-cate.js doesn't
