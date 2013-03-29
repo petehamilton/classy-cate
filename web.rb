@@ -32,24 +32,6 @@ get '/classy-cate.js' do
   js
 end
 
-get '/timeline.js' do
-  begin
-    tl = settings.cache.get('timeline.js')
-    if tl.nil?
-      logger.info "Caching timeline js"
-      tl = coffee(erb(:"timeline.coffee"))
-      settings.cache.set('timeline.js', tl)
-    end
-  rescue *[Dalli::RingError, Dalli::NetworkError]
-    tl = coffee(erb(:"timeline.coffee"))
-  end
-  tl
-end
-
-get '/timeline.css' do
-  send_file('views/timeline.css')
-end
-
 get '/classy-cate.css' do
   begin
     css = settings.cache.get('classy-cate-css')

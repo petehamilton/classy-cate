@@ -11,8 +11,6 @@ function main() {
     $('head').append('<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>');
     //$('head').append('<script type="text/javascript" src="http://localhost:4567/classy-cate.js"></script>');  //testing
     $('head').append('<script type="text/javascript" src="https://classy-cate.herokuapp.com/classy-cate.js"></script>');
-    //$('head').append('<script type="text/javascript" src="http://localhost:4567/timeline.js"></script>'); //testing
-    $('head').append('<script type="text/javascript" src="https://classy-cate.herokuapp.com/timeline.js"></script>');
 }
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading

@@ -476,20 +476,6 @@
       }
     }
     return _results;
-    /*structure = {
-      title : ['id','type']
-      extendedTitle : ['name']
-      content :
-        names : ['HAND IN', 'SPEC', 'GIVENS']
-        links : ['handin', 'spec', 'givens']
-    }
-    destDiv = $('#page-content')
-    for module in modules
-      if module.exercises? and module.exercises[0]?
-        destDiv.append('<h3>' + module.id + ' - ' + module.name + '</h3>')
-        createTimelineWithMoments(vars.start, vars.end, 
-          'day', destDiv, module.exercises, structure)
-    */
 
   };
 

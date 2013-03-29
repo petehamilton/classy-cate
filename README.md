@@ -57,5 +57,3 @@ of complexity just to get it working, then have a look at [this](https://github.
 - [jQuery](http://api.jquery.com/jQuery/) as a Javascript Framework
 - [Twitter Bootstrap](http://twitter.github.com/bootstrap/) for pretty CSS
 - [Font Awesome](http://fortawesome.github.com/Font-Awesome/) for a breadth of nice scalable icons
-- [jQuery Timeline](http://github.com/lmj112/jQueryTimeline/) for the
-exercises page timelines
