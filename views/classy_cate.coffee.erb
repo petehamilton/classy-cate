@@ -422,7 +422,7 @@ populate_exercises_page = (vars) ->
 
   for module in (m for m in modules when m.exercises[0]?) # Ignore empty modules
     module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>')
-    
+
     if module.notesLink?
       module_header.text(module_header.text() + " - ")
       $('<a/>').attr('href', module.notesLink).html('Notes').appendTo(module_header)
@@ -518,13 +518,17 @@ load_grades_page = (e) ->
     populate_grades_page(grade_page_vars)
 
 load_exercises_page = (e, fallback) ->
+
+  # Return true if the given period falls on a holiday
+  isHoliday = (period) -> period%2 == 0
+
   e.preventDefault() if e?
   window.location.hash = "timetable"
   href = $('#nav-exercises').attr('href')
   period = parseInt href.split('period=')[1][0]
   if fallback?
     href = href.replace(('period=' + period),('period=' + (period - 1)))
-  isHoliday = (period) -> period%2 == 0
+    
   load_cate_page href, (body) ->
     exercise_page_vars = extract_exercise_page_data body
     go_forth_and_multiply = true
