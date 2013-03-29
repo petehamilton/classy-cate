@@ -1,3 +1,22 @@
 .row
   .span12
     %h2{:id => "term_title"} Timetable of Exercises
+
+
+%table#exercises_template.hidden.module_table.table-striped.table-bordered
+  %tr
+    %th ID
+    %th Name
+    %th Set On
+    %th Due On
+    %th Spec Link
+    %th Given link
+
+%table
+  %tr#exercise_row_template.hidden
+    %td.id NA
+    %td.name NA
+    %td.set NA
+    %td.due NA
+    %td.spec NA
+    %td.given NA

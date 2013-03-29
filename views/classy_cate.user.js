@@ -2,7 +2,7 @@
 // @name         Classy CATE
 // @author       Peter Hamilton
 // @description  CATE Hurts eyes. This makes it hurt them less.
-// @version 2.0
+// @version 1.2
 // @match https://cate.doc.ic.ac.uk/*
 // ==/UserScript==
 
@@ -13,8 +13,6 @@ function main() {
     $('head').append('<script type="text/javascript" src="https://classy-cate.herokuapp.com/classy-cate.js"></script>');
     //$('head').append('<script type="text/javascript" src="http://localhost:4567/timeline.js"></script>'); //testing
     $('head').append('<script type="text/javascript" src="https://classy-cate.herokuapp.com/timeline.js"></script>');
-    //$('head').append('<link rel="stylesheet" href="http://localhost:4567/timeline.css" type="text/css">') //testing
-    $('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/timeline.css" type="text/css">')
 }
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading

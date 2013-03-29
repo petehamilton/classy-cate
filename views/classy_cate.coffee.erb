@@ -7,487 +7,511 @@ MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page).gsub("\n", "") %>
 GRADES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :grades_page).gsub("\n", "") %>'
 EXERCISES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :exercises_page).gsub("\n", "") %>'
 
-CLASSY_CATE_SCRIPT_VERSION = "2.0"
+CLASSY_CATE_SCRIPT_VERSION = "1.2"
 
 #///////////////////////////////////////////////////////////////////////////////
 # Helper Functions
 #///////////////////////////////////////////////////////////////////////////////
 populate_html = (element, raw) ->
-	$(element).html($("<div/>").html(raw).text())
+  $(element).html($("<div/>").html(raw).text())
 
 activate_nostalgia_mode = ->
-	nostalgia_colors = ['Teal', 'DarkCyan', 'DeepSkyBlue', 'DarkTurquoise', 'MediumSpringGreen',
-										 'Lime', 'SpringGreen', 'Aqua', 'Cyan', 'MidnightBlue', 'DodgerBlue',
-										 'LightSeaGreen', 'Turquoise', 'RoyalBlue', 'SteelBlue', 'MediumTurquoise',
-										 'CadetBlue', 'CornflowerBlue', 'MediumAquaMarine']
+  nostalgia_colors = ['Teal', 'DarkCyan', 'DeepSkyBlue', 'DarkTurquoise', 'MediumSpringGreen',
+                     'Lime', 'SpringGreen', 'Aqua', 'Cyan', 'MidnightBlue', 'DodgerBlue',
+                     'LightSeaGreen', 'Turquoise', 'RoyalBlue', 'SteelBlue', 'MediumTurquoise',
+                     'CadetBlue', 'CornflowerBlue', 'MediumAquaMarine']
 
-	$('body, footer, div, span, td, input').each (index, elem) ->
-		random_nostalgia_color = nostalgia_colors[Math.floor(Math.random()*nostalgia_colors.length)]
-		$(elem).css('background', random_nostalgia_color)
+  $('body, footer, div, span, td, input').each (index, elem) ->
+    random_nostalgia_color = nostalgia_colors[Math.floor(Math.random()*nostalgia_colors.length)]
+    $(elem).css('background', random_nostalgia_color)
 
-	$('#old-cate-button').unbind()
-	$('#old-cate-button').html("Mother of God, make it stop!")
-	$('#old-cate-button').bind 'click', ->
-		alert('Nope, you made your bed, now lie in it...')
+  $('#old-cate-button').unbind()
+  $('#old-cate-button').html("Mother of God, make it stop!")
+  $('#old-cate-button').bind 'click', ->
+    alert('Nope, you made your bed, now lie in it...')
 
 text_extract = (html) ->
-	html.text().trim().replace(/(\r\n|\n|\r)/gm,"");
+  html.text().trim().replace(/(\r\n|\n|\r)/gm,"");
 
 load_cate_page = (url, callback) ->
-	$.ajax
-		type: 'GET'
-		url: url
-		dataType: 'html'
-		success: (data) ->
-			frame = $('<iframe class="hidden" src="about:blank"/>').hide()
-			frame.appendTo('body')
-			doc = frame.get(0).contentWindow.document
-			doc.write(data)
-			body = $('body', doc).clone()
-			frame.remove()
-			callback(body)
+  $.ajax
+    type: 'GET'
+    url: url
+    dataType: 'html'
+    success: (data) ->
+      frame = $('<iframe class="hidden" src="about:blank"/>').hide()
+      frame.appendTo('body')
+      doc = frame.get(0).contentWindow.document
+      doc.write(data)
+      body = $('body', doc).clone()
+      frame.remove()
+      callback(body)
 
 
 #///////////////////////////////////////////////////////////////////////////////
 # Code to extract details from pages
 #///////////////////////////////////////////////////////////////////////////////
 extract_main_page_data = (html) ->
-	current_url = document.URL
-	current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check
-	current_user = current_url.match("[0-9]+:(.*)")[1] # TODO: Error Check
+  current_url = document.URL
+  current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check
+  current_user = current_url.match("[0-9]+:(.*)")[1] # TODO: Error Check
 
-	version = html.find('table:first td:first').text()
+  version = html.find('table:first td:first').text()
 
-	profile_image_src = html.find('table:eq(2) table:eq(1) tr:eq(0) img').attr('src')
+  profile_image_src = html.find('table:eq(2) table:eq(1) tr:eq(0) img').attr('src')
 
-	profile_fields = html.find('table:eq(2) table:eq(1) tr:eq(1) td').map (i, e) -> $(e).text()
-	first_name = profile_fields[0]
-	last_name = profile_fields[1]
-	login = profile_fields[2]
-	category = profile_fields[3]
-	candidate_number = profile_fields[4]
-	cid = profile_fields[5]
-	personal_tutor = profile_fields[6]
+  profile_fields = html.find('table:eq(2) table:eq(1) tr:eq(1) td').map (i, e) -> $(e).text()
+  first_name = profile_fields[0]
+  last_name = profile_fields[1]
+  login = profile_fields[2]
+  category = profile_fields[3]
+  candidate_number = profile_fields[4]
+  cid = profile_fields[5]
+  personal_tutor = profile_fields[6]
 
-	available_years = html.find('select[name=newyear] option').map (index, elem) ->
-		elem = $(elem)
-		{text: elem.html(), href: elem.attr('value')}
-	available_years = available_years.slice(1)
+  available_years = html.find('select[name=newyear] option').map (index, elem) ->
+    elem = $(elem)
+    {text: elem.html(), href: elem.attr('value')}
+  available_years = available_years.slice(1)
 
-	other_func_links = html.find('table:eq(2) table:eq(9) tr td:nth-child(3) a').map (index, elem) ->
-		$(elem).attr('href')
+  other_func_links = html.find('table:eq(2) table:eq(9) tr td:nth-child(3) a').map (index, elem) ->
+    $(elem).attr('href')
 
-	grading_schema_link = other_func_links[0]
-	documentation_link = other_func_links[1]
-	extensions_link = other_func_links[2]
-	projects_portal_link = other_func_links[3]
-	individual_records_link = other_func_links[4]
+  grading_schema_link = other_func_links[0]
+  documentation_link = other_func_links[1]
+  extensions_link = other_func_links[2]
+  projects_portal_link = other_func_links[3]
+  individual_records_link = other_func_links[4]
 
-	default_class = html.find('input[name=class]:checked').val()
-	default_period = html.find('input[name=period]:checked').val()
+  default_class = html.find('input[name=class]:checked').val()
+  default_period = html.find('input[name=period]:checked').val()
 
-	keyt = html.find('input[type=hidden]').val()
+  keyt = html.find('input[type=hidden]').val()
 
-	timetable_url = '/timetable.cgi?period=' + default_period + '&class=' + default_class + '&keyt=' + keyt
+  timetable_url = '/timetable.cgi?period=' + default_period + '&class=' + default_class + '&keyt=' + keyt
 
-	return {
-		current_url: current_url
-		current_year: current_year
-		current_user: current_user
-		version: version
-		profile_image_src: profile_image_src
-		first_name: first_name
-		last_name: last_name
-		login: login
-		category: category
-		candidate_number: candidate_number
-		cid: cid
-		personal_tutor: personal_tutor
-		available_years: available_years
-		grading_schema_link: grading_schema_link
-		documentation_link: documentation_link
-		extensions_link: extensions_link
-		projects_portal_link: projects_portal_link
-		individual_records_link: individual_records_link
-		default_class: default_class
-		default_period: default_period
-		keyt: keyt
-		timetable_url: timetable_url
-	}
+  return {
+    current_url: current_url
+    current_year: current_year
+    current_user: current_user
+    version: version
+    profile_image_src: profile_image_src
+    first_name: first_name
+    last_name: last_name
+    login: login
+    category: category
+    candidate_number: candidate_number
+    cid: cid
+    personal_tutor: personal_tutor
+    available_years: available_years
+    grading_schema_link: grading_schema_link
+    documentation_link: documentation_link
+    extensions_link: extensions_link
+    projects_portal_link: projects_portal_link
+    individual_records_link: individual_records_link
+    default_class: default_class
+    default_period: default_period
+    keyt: keyt
+    timetable_url: timetable_url
+  }
 
 # Given a jQuery object representing the CATe body of the page...
 extract_exercise_page_data = (html) ->
 
-	extract_term_title = (html) ->
-		title_cell = html.find('tr').eq(0).find('h1').eq(0)
-		title_cell.text()
+  extract_term_title = (html) ->
+    html.find('tr').eq(0).find('h1').eq(0).text()
 
-	parseDate = (input) ->
-		parts = input.match(/(\d+)/g)
-		new Date(parts[0], parts[1] - 1, parts[2])
+  parseDate = (input) ->
+    parts = input.match(/(\d+)/g)
+    new Date(parts[0], parts[1] - 1, parts[2])
 
-	extract_academic_years = (body) ->
-		[y1, y2] = body.find('h1').text()[-9..].split('-')
+  extract_academic_years = (body) ->
+    [y1, y2] = body.find('h1').text()[-9..].split('-')
 
-	extract_start_end_dates = (fullTable, years) ->
-		dateStr_to_numStr = (str) ->
-			months = ('January,February,March,April,May,June,July,' + 
-				'August,September,October,November,December').split(',')
-			months.indexOf(str) + 1
-		months = 
-			($(cell).text().replace(/\s+/g, '') for cell in $(fullTable).find('tr').eq(0).find('th') \
-				when $(cell).attr('bgcolor') == "white")
-		firstMonth = dateStr_to_numStr months[0]
-		lastMonth = dateStr_to_numStr months[months.length-1]
-		year = (if parseInt(firstMonth) < 9 then years[1] else years[0])
-		dates = $(fullTable).find('tr').eq(2).find('th')
-		i = 0
-		while $(dates[i]).text().length == 0
-			i++
-		dates = 
-			($(cell).text() for cell in $(fullTable).find('tr').eq(2).find('th') \
-				when $(cell).text().replace(/\s+/g, '').length != 0)
-		firstDate = dates[0]
-		lastDate = dates[dates.length-1]
-		return {  # remember date in yyyy-mm-dd format
-			start : year + '-' + firstMonth + '-' + firstDate
-			end : year + '-' + lastMonth + '-' + lastDate
-			colBufferToFirst : i - 1
-			toString : ->
-				'First : ' + @start + '\nLast : ' + @end + '\nCol Buffer : ' + @colBufferToFirst
-		}
+  extract_start_end_dates = (fullTable, years) ->
+    
+    dateStr_to_numStr = (str) ->
+      months = ('January,February,March,April,May,June,July,' + 
+        'August,September,October,November,December').split(',')
+      months.indexOf(str) + 1
 
-	process_module_cell = (cell) -> # remember, jQuery cell
-		[id, name] = cell.text().split(' - ')
-		return {
-			id : id
-			name : name.replace(/^\s+|\s+$/g, '')
-			notesLink : cell.find('a').eq(0).attr('href')
-			toString : ->
-				"Module ID : " + @id + '\nModule name : ' + @name + '\nNotes link : ' + @notesLink
-		}
+    months = # get array of the months
+      ($(cell).text().replace(/\s+/g, '') for cell in $(fullTable).find('tr').eq(0).find('th') \
+        when $(cell).attr('bgcolor') == "white")
+    firstMonth = dateStr_to_numStr months[0]
+    lastMonth = dateStr_to_numStr months[months.length-1] if months.length != 1
+    
+    year = (if parseInt(firstMonth) < 9 then years[1] else years[0])
+    dates = $(fullTable).find('tr').eq(2).find('th')
+    i = 0
+    while $(dates[i]).text().length == 0
+      i++
+    dates = 
+      ($(cell).text() for cell in $(fullTable).find('tr').eq(2).find('th') \
+        when $(cell).text().replace(/\s+/g, '').length != 0)
+    firstDate = dates[0]
+    lastDate = dates[dates.length-1]
+    return {  # remember date in yyyy-mm-dd format
+      start : year + '-' + firstMonth + '-' + firstDate
+      end : year + '-' + lastMonth + '-' + lastDate
+      colBufferToFirst : i - 1
+    }
 
-	process_exercises_from_cells = (module,cells) -> # take the module and the array of cells
-		if not cells? then return null
-		#console.log '******** ' + module.name + ' ************************************'
-		module.exercises ?= []
-		currentDate = parseDate dates.start
-		currentDate.setDate(currentDate.getDate() - dates.colBufferToFirst)
-		for exCell in cells
-			colSpan = parseInt($(exCell).attr('colspan'))
-			#console.log colSpan
-			if $(exCell).attr('bgcolor')? and $(exCell).find('a').length != 0
-				[id, type] = $(exCell).find('b').eq(0).text().split(':')
-				hrefs = ($(anchor).attr('href') for anchor in $(exCell).find('a') when $(anchor).attr('href')?)
-				for href in hrefs
-					if /mailto/i.test(href)
-						mailto = href
-					else if /SPECS/i.test(href)
-						spec = href
-					else if /given/i.test(href)
-						givens = href
-				end = new Date(currentDate.getTime())
-				end.setDate(end.getDate() + colSpan - 1)
-				ex = {
-					id : id, type : type, start : new Date(currentDate.getTime())
-					end : end, moduleName : module.name
-					name : $(exCell).text()[(id.length + type.length + 2)..]
-					mailto : mailto, spec : spec, givens : givens
-					toString : ->
-						"{" + @id + ':' + @type + "} -- " + @name +
-						"\nSet date : " +  @start.getDate()+'/'+@start.getMonth()+'/'+@start.getYear() +
-						"\nDue date : " + @end.getDate()+'/'+@end.getMonth()+'/'+@end.getYear()
-				}
-				#console.log ex.toString()
-				module.exercises.push(ex)
-			currentDate.setDate (currentDate.getDate() + colSpan)
+  process_module_cell = (cell) -> # remember, jQuery cell
+    [id, name] = cell.text().split(' - ')
+    return {
+      id : id
+      name : name.replace(/^\s+|\s+$/g, '')
+      notesLink : cell.find('a').eq(0).attr('href')
+    }
 
-	extract_module_exercise_data = (fullTable) ->  # strippedTable
-		rows = ($(row) for row in $(fullTable).find('tr') \
-			when $($(row).find('td').eq(1)).find('font').attr('color') == "blue")
-		allRows = $(fullTable).find('tr')
-		modules = []
-		count = 0
-		while count < allRows.length
-			currentRow = allRows[count]
-			noOfFollowingRows = 0
-			module = $($(currentRow).find('td').eq(1))
-			isModule = false
-			if module.find('font').attr('color') == "blue"
-				isModule = true
-				module = process_module_cell module
-				noOfFollowingRows = $(currentRow).find('td').eq(0).attr('rowspan') - 1
-				followingRows = allRows[count+1..count+noOfFollowingRows]
-				exerciseCells = 
-					($(row).find('td')[1..] for row in followingRows)
-				exerciseCells.push($(currentRow).find('td')[4..])
-				exerciseCells = (cs for cs in exerciseCells when cs?)
-				process_exercises_from_cells module, cells for cells in exerciseCells
-			modules.push module if isModule
-			count = count + noOfFollowingRows + 1
-		return modules
+  process_exercises_from_cells = (module,cells) -> # take the module and the array of cells
+    if not cells? then return null
+    module.exercises ?= []
+    currentDate = parseDate dates.start
+    currentDate.setDate(currentDate.getDate() - dates.colBufferToFirst)
+    for exCell in cells
+      colSpan = parseInt($(exCell).attr('colspan'))
+      if $(exCell).attr('bgcolor')? and $(exCell).find('a').length != 0
+        [id, type] = $(exCell).find('b').eq(0).text().split(':')
+        hrefs = ($(anchor).attr('href') for anchor in $(exCell).find('a') when $(anchor).attr('href')?)
+        for href in hrefs
+          if /mailto/i.test(href)
+            mailto = href
+          else if /SPECS/i.test(href)
+            spec = href
+          else if /given/i.test(href)
+            givens = href
+        end = new Date(currentDate.getTime())
+        end.setDate(end.getDate() + colSpan - 1)
+        ex = {
+          id : id, type : type, start : new Date(currentDate.getTime())
+          end : end, moduleName : module.name
+          name : $(exCell).text()[(id.length + type.length + 2)..]
+          mailto : mailto, spec : spec, givens : givens
+        }
+        module.exercises.push(ex)
+      currentDate.setDate (currentDate.getDate() + colSpan)
 
-	term_title = extract_term_title html
-	timetable = (tb for tb in html.find('table') when $(tb).attr('border') == "0")
-	dates = extract_start_end_dates timetable, extract_academic_years html
-	modules = extract_module_exercise_data timetable
-	return {
-		modules : modules
-		start : dates.start, end : dates.end
-		term_title : term_title
-	}
+  extract_module_exercise_data = (fullTable) ->  # strippedTable
+    rows = ($(row) for row in $(fullTable).find('tr') \
+      when $($(row).find('td').eq(1)).find('font').attr('color') == "blue")
+    allRows = $(fullTable).find('tr')
+    modules = []
+    count = 0
+    while count < allRows.length
+      currentRow = allRows[count]
+      noOfFollowingRows = 0
+      module = $($(currentRow).find('td').eq(1))
+      isModule = false
+      if module.find('font').attr('color') == "blue"
+        isModule = true
+        module = process_module_cell module
+        noOfFollowingRows = $(currentRow).find('td').eq(0).attr('rowspan') - 1
+        followingRows = allRows[count+1..count+noOfFollowingRows]
+        exerciseCells = 
+          ($(row).find('td')[1..] for row in followingRows)
+        exerciseCells.push($(currentRow).find('td')[4..])
+        exerciseCells = (cs for cs in exerciseCells when cs?)
+        process_exercises_from_cells module, cells for cells in exerciseCells
+      modules.push module if isModule
+      count = count + noOfFollowingRows + 1
+    return modules
 
+  term_title = extract_term_title html
+  timetable = (tb for tb in html.find('table') when $(tb).attr('border') == "0")
+  dates = extract_start_end_dates timetable, extract_academic_years html
+  modules = extract_module_exercise_data timetable
+  m.exercises.sort ((a,b) -> if a.start < b.start then -1 else 1) for m in modules
+  return {
+    modules : modules
+    start : dates.start, end : dates.end
+    term_title : term_title
+  }
+  
 
+##//////////////////////////////////////////////////////////////////////////////////////
 extract_grades_page_data = (html) ->
-	process_header_row = (row) ->
-		# TODO: Regex out the fluff
-		return {
-			name: text_extract row.find('td:eq(0)')
-			term: text_extract row.find('td:eq(1)')
-			submission: text_extract row.find('td:eq(2)')
-			level: text_extract row.find('td:eq(3)')
-			exercises: []
-		}
+  process_header_row = (row) ->
+    # TODO: Regex out the fluff
+    return {
+      name: text_extract row.find('td:eq(0)')
+      term: text_extract row.find('td:eq(1)')
+      submission: text_extract row.find('td:eq(2)')
+      level: text_extract row.find('td:eq(3)')
+      exercises: []
+    }
 
-	process_grade_row = (row) ->
-		return {
-			id: parseInt(text_extract row.find('td:eq(0)'))
-			type: text_extract row.find('td:eq(1)')
-			title: text_extract row.find('td:eq(2)')
-			set_by: text_extract row.find('td:eq(3)')
-			declaration: text_extract row.find('td:eq(4)')
-			extension: text_extract row.find('td:eq(5)')
-			submission: text_extract row.find('td:eq(6)')
-			grade: text_extract row.find('td:eq(7)')
-		}
+  process_grade_row = (row) ->
+    return {
+      id: parseInt(text_extract row.find('td:eq(0)'))
+      type: text_extract row.find('td:eq(1)')
+      title: text_extract row.find('td:eq(2)')
+      set_by: text_extract row.find('td:eq(3)')
+      declaration: text_extract row.find('td:eq(4)')
+      extension: text_extract row.find('td:eq(5)')
+      submission: text_extract row.find('td:eq(6)')
+      grade: text_extract row.find('td:eq(7)')
+    }
 
-	extract_modules = (table) ->
-		grade_rows = table.find('tr')
-		grade_rows = grade_rows.slice(2)
+  extract_modules = (table) ->
+    grade_rows = table.find('tr')
+    grade_rows = grade_rows.slice(2)
 
-		modules = []
-		current_module = null;
-		grade_rows.each (i, e) ->
-			row_elem = $(e)
-			tds = row_elem.find('td')
-			if tds.length > 1 # Ignore spacer/empty rows
-				if $(tds[0]).attr('colspan')
-					current_module = process_header_row(row_elem)
-					modules.push current_module
-				else
-					current_module.exercises.push process_grade_row(row_elem)
+    modules = []
+    current_module = null;
+    grade_rows.each (i, e) ->
+      row_elem = $(e)
+      tds = row_elem.find('td')
+      if tds.length > 1 # Ignore spacer/empty rows
+        if $(tds[0]).attr('colspan')
+          current_module = process_header_row(row_elem)
+          modules.push current_module
+        else
+          current_module.exercises.push process_grade_row(row_elem)
 
-		return modules
+    return modules
 
-	# TODO: Regex extract useful values
-	subscription_last_updated = text_extract html.find('table:eq(7) table td:eq(1)')
-	submissions_completed = text_extract html.find('table:eq(7) table td:eq(4)')
-	submissions_extended = text_extract html.find('table:eq(7) table td:eq(6)')
-	submissions_late = text_extract html.find('table:eq(7) table td:eq(8)')
+  # TODO: Regex extract useful values
+  subscription_last_updated = text_extract html.find('table:eq(7) table td:eq(1)')
+  submissions_completed = text_extract html.find('table:eq(7) table td:eq(4)')
+  submissions_extended = text_extract html.find('table:eq(7) table td:eq(6)')
+  submissions_late = text_extract html.find('table:eq(7) table td:eq(8)')
 
-	required_modules = extract_modules html.find('table:eq(9)')
-	optional_modules = extract_modules html.find('table:eq(-2)')
+  required_modules = extract_modules html.find('table:eq(9)')
+  optional_modules = extract_modules html.find('table:eq(-2)')
 
-	return {
-		stats:
-			subscription_last_updated: subscription_last_updated
-			submissions_completed: submissions_completed
-			submissions_extended: submissions_extended
-			submissions_late: submissions_late
-		required_modules: required_modules
-		optional_modules: optional_modules
-	}
+  return {
+    stats:
+      subscription_last_updated: subscription_last_updated
+      submissions_completed: submissions_completed
+      submissions_extended: submissions_extended
+      submissions_late: submissions_late
+    required_modules: required_modules
+    optional_modules: optional_modules
+  }
 
 
 #///////////////////////////////////////////////////////////////////////////////
 # Code to construct the new layouts
 #///////////////////////////////////////////////////////////////////////////////
 populate_layout = (vars) ->
-	$('#cc-version').html(vars.version)
-	$('#nav-dashboard').attr('href', vars.current_url)
-	$('#nav-exercises').attr('href', vars.timetable_url)
-	$('#nav-grades').attr('href', vars.individual_records_link)
-	$('#cc-current-year').html("(#{vars.current_year})")
+  $('#cc-version').html(vars.version)
+  $('#nav-dashboard').attr('href', vars.current_url)
+  $('#nav-exercises').attr('href', vars.timetable_url)
+  $('#nav-grades').attr('href', vars.individual_records_link)
+  $('#cc-current-year').html("(#{vars.current_year})")
 
-	if window.classy_cate_script_version != CLASSY_CATE_SCRIPT_VERSION
-		$('#page-content').before('<div class="alert alert-error">' +
-																	'Your Classy-CATE script is out of date! ' +
-																	'<a href="http://classy-cate.herokuapp.com/classy-cate.user.js">' +
-																		'Click Here'+
-																	'</a>' +
-																	' to update to CCv' + CLASSY_CATE_SCRIPT_VERSION + '</a>')
+  if window.classy_cate_script_version != CLASSY_CATE_SCRIPT_VERSION
+    $('#page-content').before('<div class="alert alert-error">' +
+                                  'Your Classy-CATE script is out of date! ' +
+                                  '<a href="http://classy-cate.herokuapp.com/classy-cate.user.js">' +
+                                    'Click Here'+
+                                  '</a>' +
+                                  ' to update to CCv' + CLASSY_CATE_SCRIPT_VERSION + '</a>')
 
-	# New Bindings
-	$('#nav-dashboard').bind 'click', load_dashboard_page
-	$('#nav-grades').bind 'click', load_grades_page
-	$('#old-cate-button').bind 'click', activate_nostalgia_mode
+  # New Bindings
+  $('#nav-dashboard').bind 'click', load_dashboard_page
+  $('#nav-grades').bind 'click', load_grades_page
+  $('#old-cate-button').bind 'click', activate_nostalgia_mode
 
 populate_main_page = (vars) ->
-	$('#cc-identity-profile-image').attr('src', vars.profile_image_src)
-	$('#cc-identity-first-name').html(vars.first_name)
-	$('#cc-identity-last-name').html(vars.last_name)
-	$('#cc-identity-login').html(vars.login)
-	$('#cc-identity-category').html(vars.category)
-	$('#cc-identity-candidate-number').html(vars.candidate_number)
-	$('#cc-identity-cid').html(vars.cid)
-	$('#cc-identity-personal-tutor').html(vars.personal_tutor)
+  $('#cc-identity-profile-image').attr('src', vars.profile_image_src)
+  $('#cc-identity-first-name').html(vars.first_name)
+  $('#cc-identity-last-name').html(vars.last_name)
+  $('#cc-identity-login').html(vars.login)
+  $('#cc-identity-category').html(vars.category)
+  $('#cc-identity-candidate-number').html(vars.candidate_number)
+  $('#cc-identity-cid').html(vars.cid)
+  $('#cc-identity-personal-tutor').html(vars.personal_tutor)
 
-	vars.available_years.each (i, val) ->
-		$('#cc-year-dropdown').append '<li><a href="' + val.href + '">' + val.text + '</a></li>'
+  vars.available_years.each (i, val) ->
+    $('#cc-year-dropdown').append '<li><a href="' + val.href + '">' + val.text + '</a></li>'
 
-	$('#cc-other-projects-portal').attr('href', vars.projects_portal_link)
-	$('#cc-other-extensions').attr('href', vars.extensions_link)
-	$('#cc-other-documentation').attr('href', vars.documentation_link)
+  $('#cc-other-projects-portal').attr('href', vars.projects_portal_link)
+  $('#cc-other-extensions').attr('href', vars.extensions_link)
+  $('#cc-other-documentation').attr('href', vars.documentation_link)
 
-	$('#cc-keyt').val(vars.keyt)
-	$('#cc-class-select').val(vars.default_class)
-	$('#cc-period-select').val(vars.default_period)
+  $('#cc-keyt').val(vars.keyt)
+  $('#cc-class-select').val(vars.default_class)
+  $('#cc-period-select').val(vars.default_period)
 
 populate_exercises_page = (vars) ->
-	modules = vars.modules
-	structure = {
-		title : ['id','type']
-		extendedTitle : ['name']
-		content :
-			names : ['HAND IN', 'SPEC', 'GIVENS']
-			links : ['handin', 'spec', 'givens']
-	}
-	destDiv = $('#page-content')
-	$('#term_title').text('Timetable - ' + vars.term_title)
-	for module in modules
-		if module.exercises? and module.exercises[0]?
-			destDiv.append('<h3>' + module.id + ' - ' + module.name + '</h3>')
-			createTimelineWithMoments(vars.start, vars.end, 
-				'day', destDiv, module.exercises, structure)
+
+  format_date = (d) ->
+    pad = (a,b) ->
+      (1e15+a+"").slice(-b)
+    pad(d.getDate(),2) + '/' + pad(d.getMonth()+1,2) + '/' + d.getFullYear()
+
+  populate_exercise_row = (row, ex) ->
+    row.find('.id').html('{'+ex.id+':'+ex.type+'}')
+    if /\S/.test(ex.name)
+      row.find('td.name').text(ex.name)
+    row.find('td.set').text(format_date ex.start)
+    row.find('td.due').text(format_date ex.end)
+    console.log row.html()
+    if ex.spec? 
+      (specCell = row.find('.spec')).text('')
+      $(document.createElement('a')).attr('href',ex.spec).html('Spec Link').appendTo(specCell)
+    if ex.givens? 
+      givensCell = row.find('.given').text('')
+      $(document.createElement('a')).attr('href',ex.givens).html('Givens').appendTo(givensCell)
+
+  destDiv = $('#page-content')
+  modules = vars.modules
+  $('#term_title').text('Timetable - ' + vars.term_title)
+  for module in (m for m in modules when m.exercises[0]?)
+    destDiv.append('<h3>' + module.id + ' - ' + module.name + '</h3>')
+      .append(moduleTable = $('#exercises_template').clone().removeClass('hidden'))
+    moduleTable.css('width','100%')
+    for ex in module.exercises
+      (row = $('#exercise_row_template').clone())
+        .removeClass('hidden')
+        .appendTo(moduleTable)
+      populate_exercise_row row, ex
+
+  ###structure = {  # For implementing the timeline views
+    title : ['id','type']
+    extendedTitle : ['name']
+    content :
+      names : ['HAND IN', 'SPEC', 'GIVENS']
+      links : ['handin', 'spec', 'givens']
+  }
+  destDiv = $('#page-content')
+  for module in modules
+    if module.exercises? and module.exercises[0]?
+      destDiv.append('<h3>' + module.id + ' - ' + module.name + '</h3>')
+      createTimelineWithMoments(vars.start, vars.end, 
+        'day', destDiv, module.exercises, structure)###
 
 
 populate_grades_page = (vars) ->
 
-	grade_to_class = (grade) ->
-		switch grade
-			when "A*", "A+", "A" then "progress-success"
-			when "B"  then "progress-info"
-			when "C" then "progress-warning"
-			when "D", "E", "F" then "progress-danger"
+  grade_to_class = (grade) ->
+    switch grade
+      when "A*", "A+", "A" then "progress-success"
+      when "B"  then "progress-info"
+      when "C" then "progress-warning"
+      when "D", "E", "F" then "progress-danger"
 
-	grade_to_width = (grade) ->
-		width = switch grade
-			when "A*" then 100
-			when "A+" then 89
-			when "A"  then 79
-			when "B"  then 69
-			when "C"  then 59
-			when "D"  then 49
-			when "E"  then 39
-			when "F"  then 29
-			else 0
-		"#{width}%"
+  grade_to_width = (grade) ->
+    width = switch grade
+      when "A*" then 100
+      when "A+" then 89
+      when "A"  then 79
+      when "B"  then 69
+      when "C"  then 59
+      when "D"  then 49
+      when "E"  then 39
+      when "F"  then 29
+      else 0
+    "#{width}%"
 
-	render_module = (module) ->
-		module_elem = $('#module_template .row').clone()
-		module_elem.find('.module-title').html(module.name)
+  render_module = (module) ->
+    module_elem = $('#module_template .row').clone()
+    module_elem.find('.module-title').html(module.name)
 
-		grades_table = module_elem.find('.module-grades')
-		if module.exercises.length == 0
-			grades_table.append($('<tr><td colspan="8">No exercises for this module.</td></tr>'))
-		else
-			$(module.exercises).each (i, exercise) ->
-				exercise_elem = $('#exercise_template tr').clone()
-				exercise_elem.find('.exercise-id').html(exercise.id)
-				exercise_elem.find('.exercise-type').html(exercise.type)
-				exercise_elem.find('.exercise-title').html(exercise.title)
-				exercise_elem.find('.exercise-set-by').html(exercise.set_by)
-				exercise_elem.find('.exercise-declaration').html(exercise.declaration)
-				exercise_elem.find('.exercise-extension').html(exercise.extension)
-				exercise_elem.find('.exercise-submission').html(exercise.submission)
+    grades_table = module_elem.find('.module-grades')
+    if module.exercises.length == 0
+      grades_table.append($('<tr><td colspan="8">No exercises for this module.</td></tr>'))
+    else
+      $(module.exercises).each (i, exercise) ->
+        exercise_elem = $('#exercise_template tr').clone()
+        exercise_elem.find('.exercise-id').html(exercise.id)
+        exercise_elem.find('.exercise-type').html(exercise.type)
+        exercise_elem.find('.exercise-title').html(exercise.title)
+        exercise_elem.find('.exercise-set-by').html(exercise.set_by)
+        exercise_elem.find('.exercise-declaration').html(exercise.declaration)
+        exercise_elem.find('.exercise-extension').html(exercise.extension)
+        exercise_elem.find('.exercise-submission').html(exercise.submission)
 
-				switch exercise.grade
-					when ""
-						exercise_elem.find('.exercise-grade-container').html("No Record")
-					when "n/a"
-						exercise_elem.find('.exercise-grade-container').html('<i class="icon-legal" /> Awaiting Marking')
-					when "N/P"
-						exercise_elem.find('.exercise-grade-container').html('<i class="icon-lock" /> Marked, Not Published')
-					else
-						exercise_elem.find('.progress').addClass(grade_to_class(exercise.grade))
-						exercise_elem.find('.progress .bar').css('width', grade_to_width(exercise.grade))
-						exercise_elem.find('.exercise-grade').html(exercise.grade)
-				grades_table.append(exercise_elem)
-		return module_elem
+        switch exercise.grade
+          when ""
+            exercise_elem.find('.exercise-grade-container').html("No Record")
+          when "n/a"
+            exercise_elem.find('.exercise-grade-container').html('<i class="icon-legal" /> Awaiting Marking')
+          when "N/P"
+            exercise_elem.find('.exercise-grade-container').html('<i class="icon-lock" /> Marked, Not Published')
+          else
+            exercise_elem.find('.progress').addClass(grade_to_class(exercise.grade))
+            exercise_elem.find('.progress .bar').css('width', grade_to_width(exercise.grade))
+            exercise_elem.find('.exercise-grade').html(exercise.grade)
+        grades_table.append(exercise_elem)
+    return module_elem
 
-	$('#cc-subscription-updated').html(vars.stats.subscription_last_updated)
-	$('#cc-submissions-completed').html(vars.stats.submissions_completed)
-	$('#cc-submissions-extended').html(vars.stats.submissions_extended)
-	$('#cc-submissions-late').html(vars.stats.submissions_late)
+  $('#cc-subscription-updated').html(vars.stats.subscription_last_updated)
+  $('#cc-submissions-completed').html(vars.stats.submissions_completed)
+  $('#cc-submissions-extended').html(vars.stats.submissions_extended)
+  $('#cc-submissions-late').html(vars.stats.submissions_late)
 
-	$(vars.required_modules).each (i, module) ->
-		$('#cc-required-modules').append(render_module module)
+  $(vars.required_modules).each (i, module) ->
+    $('#cc-required-modules').append(render_module module)
 
-	$(vars.optional_modules).each (i, module) ->
-		$('#cc-optional-modules').append(render_module module)
+  $(vars.optional_modules).each (i, module) ->
+    $('#cc-optional-modules').append(render_module module)
 
 load_dashboard_page = (e) ->
-	e.preventDefault() if e?
-	window.location.hash = "dashboard"
-	url = $('#nav-dashboard').attr('href')
-	console.log url
-	load_cate_page url, (body) ->
-		console.log body
-		main_page_vars = extract_main_page_data(body)
-		populate_html('#page-content', MAIN_PAGE_HTML)
-		populate_main_page(main_page_vars)
+  e.preventDefault() if e?
+  window.location.hash = "dashboard"
+  url = $('#nav-dashboard').attr('href')
+  console.log url
+  load_cate_page url, (body) ->
+    console.log body
+    main_page_vars = extract_main_page_data(body)
+    populate_html('#page-content', MAIN_PAGE_HTML)
+    populate_main_page(main_page_vars)
 
 load_grades_page = (e) ->
-	e.preventDefault() if e?
-	window.location.hash = "grades"
-	load_cate_page $('#nav-grades').attr('href'), (body) ->
-		grade_page_vars = extract_grades_page_data(body)
-		populate_html('#page-content', GRADES_PAGE_HTML)
-		populate_grades_page(grade_page_vars)
+  e.preventDefault() if e?
+  window.location.hash = "grades"
+  load_cate_page $('#nav-grades').attr('href'), (body) ->
+    grade_page_vars = extract_grades_page_data(body)
+    populate_html('#page-content', GRADES_PAGE_HTML)
+    populate_grades_page(grade_page_vars)
 
 load_exercises_page = (e) ->
-	e.preventDefault() if e?
-	window.location.hash = "timetable"
-	href = $('#nav-exercises').attr('href')
-	period = parseInt href.split('period=')[1][0]
-	isHoliday = (period) -> period%2 == 0
-	if isHoliday(period) then href = href.replace('period='+period,'period='+(period-1))
-	load_cate_page href, (body) ->
-		exercise_page_vars = extract_exercise_page_data body
-		populate_html('#page-content', EXERCISES_PAGE_HTML)
-		populate_exercises_page(exercise_page_vars)
+  e.preventDefault() if e?
+  window.location.hash = "timetable"
+  href = $('#nav-exercises').attr('href')
+  period = parseInt href.split('period=')[1][0]
+  isHoliday = (period) -> period%2 == 0
+  if isHoliday(period) then href = href.replace('period='+period,'period='+(period-1))
+  load_cate_page href, (body) ->
+    exercise_page_vars = extract_exercise_page_data body
+    populate_html('#page-content', EXERCISES_PAGE_HTML)
+    populate_exercises_page(exercise_page_vars)
 
 load_css = ->
-	# Let's Bootstrap this shizzle. Files from http://www.bootstrapcdn.com/?v=01282013154951
-	$('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
-	$('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
-	$('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
+  # Let's Bootstrap this shizzle. Files from http://www.bootstrapcdn.com/?v=01282013154951
+  $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
+
 
 initial_load = ->
-	current_url = document.URL
-	# if current url contains the word personal...
-	if /personal/i.test(current_url)
-		load_css()  # boot up css
-		hash = (window.location.hash).replace('#', '')
+  current_url = document.URL
+  if /personal/i.test(current_url)
+    load_css()  
+    hash = (window.location.hash).replace('#', '')
 
-		main_page_vars = extract_main_page_data($('body'))
-		populate_html('body', LAYOUT_HTML)
-		populate_layout(main_page_vars)
+    main_page_vars = extract_main_page_data($('body'))
+    populate_html('body', LAYOUT_HTML)
+    populate_layout(main_page_vars)
 
-		if hash == "grades"
-			load_grades_page()
-		else if hash == "timetable"
-			load_exercises_page()
-		else
-			load_dashboard_page()
-	else if /student/i.test(current_url)
-		window.location = "/#grades"
-	else if /timetable/i.test(current_url)
-		window.location = "/#timetable"
-	else
-		cate_notice = $('<div>Classy CATE hasn\'t been implemented for this page yet<br/><a href="https://github.com/PeterHamilton/classy-cate">Implement it!</a></div>')
-		cate_notice.attr('style', 'padding: 20px; margin-bottom: 20px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); border: 3px solid #eed3d7; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #b94a48; background-color: #f2dede; font-size: 18px; text-align: center;')
-		$('body').prepend(cate_notice)
+    if hash == "grades"
+      load_grades_page()
+    else if hash == "timetable"
+      load_exercises_page()
+    else
+      load_dashboard_page()
+  else if /student/i.test(current_url)
+    window.location = "/#grades"
+  else if /timetable/i.test(current_url)
+    window.location = "/#timetable"
+  else
+    cate_notice = $('<div>Classy CATE hasn\'t been implemented for this page yet<br/><a href="https://github.com/PeterHamilton/classy-cate">Implement it!</a></div>')
+    cate_notice.attr('style', 'padding: 20px; margin-bottom: 20px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); border: 3px solid #eed3d7; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #b94a48; background-color: #f2dede; font-size: 18px; text-align: center;')
+    $('body').prepend(cate_notice)
 
 initial_load()
 
