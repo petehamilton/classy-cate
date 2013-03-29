@@ -77,9 +77,9 @@ Rails is a ruby gem that serves up site assets given certain url
 requests. If you look inside the web.rb file at the root of the
 directory then you should find lots of things like::
 
-    ```get '/classy-cate.user.js' do
+    get '/classy-cate.user.js' do
         send_file('views/classy_cate.user.js')
-    end```
+    end
 
 All this says is on the server being asked for the address
 `server_location/classy-cate.user.js`, deliver the file
@@ -88,7 +88,7 @@ the next question is.
 
 ### What the hell is this?::
 
-    ```get '/classy-cate.js' do
+    get '/classy-cate.js' do
         begin
             js = settings.cache.get('classy-cate-js')
             if js.nil?
@@ -100,7 +100,7 @@ the next question is.
                 js = coffee(erb(:"classy_cate.coffee"))
         end
         js
-    end```
+    end
 
 Well this looks a bit worse than that piece did. The real source of
 confusion here for most is going to be that classy-cate.js doesn't
@@ -131,7 +131,7 @@ and the like, then quickly come back here. Now to continue, the current
 distributions gem requirements are located inside the Gemfiles included
 in the repo. So before you do anything else, run::
 
-    ```bundle install```
+    bundle install
 
 from the root directory of the repo. This automates the installation of
 all the required gems with the specified versions. Once this is
@@ -152,7 +152,7 @@ but I found the most stable gem for this purpose was shotgun. As such,
 I'd advice you give that one a go before anything else, though it would
 seem that thin is the recommended.::
 
-    ```shotgun -p 4567 web.rb```
+    shotgun -p 4567 web.rb
 
 Run this from the repos root and it should start a shotgun instance,
 located at localhost:4567. This means you now have a server running on
@@ -178,7 +178,7 @@ should be golden!
 The file structure is shown below, with short explainations as to what
 each file does if it pertains to shallow development.::
 
-    ```classy-cate
+    classy-cate
     |- config.ru  (specify sinatra as the server)
     |- Gemfile    (both this and the Gemfile.lock to specify required gems)
     |- Gemfile.lock
@@ -199,7 +199,7 @@ each file does if it pertains to shallow development.::
     |         |- timeline.css             (css for the timeline plugin)
     |         +- timeline.coffee.erb      (coffeescript implementation of the
     |                                      timeline plugin)
-    +- web.rb   (file that deals with asset serving)```
+    +- web.rb   (file that deals with asset serving)
 
 ## References
 
