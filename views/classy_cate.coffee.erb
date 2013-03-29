@@ -400,28 +400,28 @@ populate_exercises_page = (vars) ->
         handin_anchor.addClass(if ex.due > (new Date()) then 'handin_link' else 'late_handin')
     row.find('td.set').text(format_date ex.start)
     row.find('td.due').text(format_date ex.end)
+
     if ex.spec? 
       (specCell = row.find('.spec')).text('')
       $(document.createElement('a')).attr('href',ex.spec).html('Spec Link').appendTo(specCell)
+
     if ex.givens? 
       givensCell = row.find('.given').text('')
       $(document.createElement('a')).attr('href',ex.givens).html('Givens').appendTo(givensCell)
 
-  destDiv = $('#page-content')
+  destination_div = $('#page-content')
   modules = vars.modules
   $('#term_title').text('Timetable - ' + vars.term_title)
-  for module in (m for m in modules when m.exercises[0]?)
-    moduleHeader = $('<h3>' + module.id + ' - ' + module.name + ' - </h3>')
-    $(document.createElement('a')).attr('href',module.notesLink).html('Notes')
-      .appendTo(moduleHeader)
-    destDiv.append(moduleHeader)
-      .append(moduleTable = $('#exercises_template').clone().removeClass('hidden'))
-    moduleTable.css('width','100%')
-    for ex in module.exercises
-      (row = $('#exercise_row_template').clone())
-        .removeClass('hidden')
-        .appendTo(moduleTable)
-      populate_exercise_row row, ex
+  
+  for module in (m for m in modules when m.exercises[0]?) # Ignore empty modules
+    module_header = $('<h3>' + module.id + ' - ' + module.name + ' - </h3>')
+    $('<a/>').attr('href', module.notesLink).html('Notes').appendTo(module_header)
+    module_table = $('#exercises_template').clone().removeClass('hidden').css('width','100%')
+    for exercise in module.exercises
+      row = $('#exercise_row_template').clone()
+      row.removeClass('hidden').appendTo(module_table)
+      populate_exercise_row row, exercise
+    destination_div.append(module_header).append(module_table)
 
 
 populate_grades_page = (vars) ->
