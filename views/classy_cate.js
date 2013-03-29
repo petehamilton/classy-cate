@@ -580,10 +580,8 @@
     }
     window.location.hash = "dashboard";
     url = $('#nav-dashboard').attr('href');
-    console.log(url);
     return load_cate_page(url, function(body) {
       var main_page_vars;
-      console.log(body);
       main_page_vars = extract_main_page_data(body);
       populate_html('#page-content', MAIN_PAGE_HTML);
       return populate_main_page(main_page_vars);
