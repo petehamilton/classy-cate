@@ -175,6 +175,7 @@ extract_exercise_page_data = (html) ->
       if $(exCell).attr('bgcolor')? and $(exCell).find('a').length != 0
         [id, type] = $(exCell).find('b').eq(0).text().split(':')
         hrefs = ($(anchor).attr('href') for anchor in $(exCell).find('a') when $(anchor).attr('href')?)
+        [mailto, spec, givens, handin] = [null, null, null, null]
         for href in hrefs
           if /mailto/i.test(href)
             mailto = href
@@ -182,13 +183,15 @@ extract_exercise_page_data = (html) ->
             spec = href
           else if /given/i.test(href)
             givens = href
+          else if /handins/i.test(href)
+            handin = href
         end = new Date(currentDate.getTime())
         end.setDate(end.getDate() + colSpan - 1)
         ex = {
           id : id, type : type, start : new Date(currentDate.getTime())
           end : end, moduleName : module.name
           name : $(exCell).text()[(id.length + type.length + 2)..]
-          mailto : mailto, spec : spec, givens : givens
+          mailto : mailto, spec : spec, givens : givens, handin : handin
         }
         module.exercises.push(ex)
       currentDate.setDate (currentDate.getDate() + colSpan)
@@ -346,10 +349,16 @@ populate_exercises_page = (vars) ->
   populate_exercise_row = (row, ex) ->
     row.find('.id').html('{'+ex.id+':'+ex.type+'}')
     if /\S/.test(ex.name)
-      row.find('td.name').text(ex.name)
+      name_cell = row.find('td.name').text(ex.name)
+      if ex.handin?
+        console.log ex.name
+        console.log ex.handin
+        name_cell.text(name_cell.text() + ' - ')
+        handin_anchor = $(document.createElement('a'))
+          .attr('href',ex.handin).html('Hand in').appendTo(name_cell)
+        handin_anchor.addClass(if ex.due > (new Date()) then 'handin_link' else 'late_handin')
     row.find('td.set').text(format_date ex.start)
     row.find('td.due').text(format_date ex.end)
-    console.log row.html()
     if ex.spec? 
       (specCell = row.find('.spec')).text('')
       $(document.createElement('a')).attr('href',ex.spec).html('Spec Link').appendTo(specCell)
@@ -472,17 +481,28 @@ load_grades_page = (e) ->
     populate_html('#page-content', GRADES_PAGE_HTML)
     populate_grades_page(grade_page_vars)
 
-load_exercises_page = (e) ->
+load_exercises_page = (e, fallback) ->
   e.preventDefault() if e?
   window.location.hash = "timetable"
   href = $('#nav-exercises').attr('href')
   period = parseInt href.split('period=')[1][0]
+  if fallback?
+    href = href.replace(('period=' + period),('period=' + (period - 1)))
+  if fallback then console.log href
   isHoliday = (period) -> period%2 == 0
-  if isHoliday(period) then href = href.replace('period='+period,'period='+(period-1))
   load_cate_page href, (body) ->
     exercise_page_vars = extract_exercise_page_data body
-    populate_html('#page-content', EXERCISES_PAGE_HTML)
-    populate_exercises_page(exercise_page_vars)
+    go_forth_and_multiply = true
+    if isHoliday(period)
+      noOfExercises = 0
+      noOfExercises += 
+        (if m.exs? then m.exs.length else 0) for m in exercise_page_vars.modules
+      if noOfExercises == '0'
+        go_forth_and_multiply = false
+        load_exercises_page e, true
+    if go_forth_and_multiply
+      populate_html('#page-content', EXERCISES_PAGE_HTML) 
+      populate_exercises_page(exercise_page_vars)
 
 load_css = ->
   # Let's Bootstrap this shizzle. Files from http://www.bootstrapcdn.com/?v=01282013154951
