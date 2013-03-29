@@ -51,6 +51,9 @@ load_cate_page = (url, callback) ->
 #///////////////////////////////////////////////////////////////////////////////
 # Code to extract details from pages
 #///////////////////////////////////////////////////////////////////////////////
+
+# CATE Homepage
+# html - A jQuery object representing the page body
 extract_main_page_data = (html) ->
   current_url = document.URL
   current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check
@@ -115,7 +118,8 @@ extract_main_page_data = (html) ->
     timetable_url: timetable_url
   }
 
-# Given a jQuery object representing the CATe body of the page...
+# Excercise Page
+# html - A jQuery object representing the page body
 extract_exercise_page_data = (html) ->
 
   extract_term_title = (html) ->
@@ -231,9 +235,9 @@ extract_exercise_page_data = (html) ->
     start : dates.start, end : dates.end
     term_title : term_title
   }
-  
 
-##//////////////////////////////////////////////////////////////////////////////////////
+# Grades/Student Record Page
+# html - A jQuery object representing the page body
 extract_grades_page_data = (html) ->
   process_header_row = (row) ->
     # TODO: Regex out the fluff
@@ -452,9 +456,7 @@ load_dashboard_page = (e) ->
   e.preventDefault() if e?
   window.location.hash = "dashboard"
   url = $('#nav-dashboard').attr('href')
-  console.log url
   load_cate_page url, (body) ->
-    console.log body
     main_page_vars = extract_main_page_data(body)
     populate_html('#page-content', MAIN_PAGE_HTML)
     populate_main_page(main_page_vars)
