@@ -75,32 +75,32 @@ exactly what you're feeling, but it's nothing too complex.
 
 Rails is a ruby gem that serves up site assets given certain url
 requests. If you look inside the web.rb file at the root of the
-directory then you should find lots of things like 
+directory then you should find lots of things like::
 
-`get '/classy-cate.user.js' do
-  send_file('views/classy_cate.user.js')
-end`
+    ```get '/classy-cate.user.js' do
+        send_file('views/classy_cate.user.js')
+    end```
 
 All this says is on the server being asked for the address
 `server_location/classy-cate.user.js`, deliver the file
 `views/classy_cate.user.js`. Simple stuff right? And I know exactly what
 the next question is.
 
-### What the hell is this?
+### What the hell is this?::
 
-`get '/classy-cate.js' do
-  begin
-    js = settings.cache.get('classy-cate-js')
-    if js.nil?
-      logger.info "Caching Classy CATE JS"
-      js = coffee(erb(:"classy_cate.coffee"))
-      settings.cache.set('classy-cate-js', js)
-    end
-  rescue *[Dalli::RingError, Dalli::NetworkError]
-    js = coffee(erb(:"classy_cate.coffee"))
-  end
-  js
-end`
+    ```get '/classy-cate.js' do
+        begin
+            js = settings.cache.get('classy-cate-js')
+            if js.nil?
+                logger.info "Caching Classy CATE JS"
+                js = coffee(erb(:"classy_cate.coffee"))
+                settings.cache.set('classy-cate-js', js)
+            end
+            rescue *[Dalli::RingError, Dalli::NetworkError]
+                js = coffee(erb(:"classy_cate.coffee"))
+        end
+        js
+    end```
 
 Well this looks a bit worse than that piece did. The real source of
 confusion here for most is going to be that classy-cate.js doesn't
@@ -129,9 +129,9 @@ First off, you need ruby. Please, if you don't have that, install it
 now. Without it you're done. While you're there read up a bit about gems
 and the like, then quickly come back here. Now to continue, the current
 distributions gem requirements are located inside the Gemfiles included
-in the repo. So before you do anything else, run
+in the repo. So before you do anything else, run::
 
-`bundle install`
+    ```bundle install```
 
 from the root directory of the repo. This automates the installation of
 all the required gems with the specified versions. Once this is
@@ -150,9 +150,9 @@ heroku on our local machine.
 There are various solutions for this, and I'm sure some will disagree
 but I found the most stable gem for this purpose was shotgun. As such,
 I'd advice you give that one a go before anything else, though it would
-seem that thin is the recommended.
+seem that thin is the recommended.::
 
-`shotgun -p 4567 web.rb`
+    ```shotgun -p 4567 web.rb```
 
 Run this from the repos root and it should start a shotgun instance,
 located at localhost:4567. This means you now have a server running on
@@ -176,30 +176,30 @@ should be golden!
 ## Basic Explaination of Filestructure
 
 The file structure is shown below, with short explainations as to what
-each file does if it pertains to shallow development.
+each file does if it pertains to shallow development.::
 
-`classy-cate
-|- config.ru  (specify sinatra as the server)
-|- Gemfile    (both this and the Gemfile.lock to specify required gems)
-|- Gemfile.lock
-|- lib  -+- git.rb
-|        |- heroku.rb
-|        +- init.rb
-|- Procfile
-|- README.md 
-|- views -+- classy_cate.coffee.erb     (the main script)
-|         |- classy_cate.less           (a condensed css file)
-|         |- classy_cate.user.js        (the *monkey production usrsrpt)
-|         |- classy_cate.user_testing.js     (testing usrscrpt)
-|         |- grades_page.haml           (all layouts for each page are
-|         |- grading_schema.haml         formed by compiling haml template
-|         |- layout.haml                 files. Much like markdown, just
-|         |- exercises_page.haml         a cleaner version of html)
-|         |- main_page.haml
-|         |- timeline.css             (css for the timeline plugin)
-|         +- timeline.coffee.erb      (coffeescript implementation of the
-|                                      timeline plugin)
-+- web.rb   (file that deals with asset serving) `
+    ```classy-cate
+    |- config.ru  (specify sinatra as the server)
+    |- Gemfile    (both this and the Gemfile.lock to specify required gems)
+    |- Gemfile.lock
+    |- lib  -+- git.rb
+    |        |- heroku.rb
+    |        +- init.rb
+    |- Procfile
+    |- README.md 
+    |- views -+- classy_cate.coffee.erb     (the main script)
+    |         |- classy_cate.less           (a condensed css file)
+    |         |- classy_cate.user.js        (the *monkey production usrsrpt)
+    |         |- classy_cate.user_testing.js     (testing usrscrpt)
+    |         |- grades_page.haml           (all layouts for each page are
+    |         |- grading_schema.haml         formed by compiling haml template
+    |         |- layout.haml                 files. Much like markdown, just
+    |         |- exercises_page.haml         a cleaner version of html)
+    |         |- main_page.haml
+    |         |- timeline.css             (css for the timeline plugin)
+    |         +- timeline.coffee.erb      (coffeescript implementation of the
+    |                                      timeline plugin)
+    +- web.rb   (file that deals with asset serving)```
 
 ## References
 
