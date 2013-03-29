@@ -347,16 +347,17 @@ populate_exercises_page = (vars) ->
     pad(d.getDate(),2) + '/' + pad(d.getMonth()+1,2) + '/' + d.getFullYear()
 
   populate_exercise_row = (row, ex) ->
-    row.find('.id').html('{'+ex.id+':'+ex.type+'}')
+    id_cell = row.find('.id')
+    if ex.handin?
+        id_cell.html('')
+        handin_anchor = $(document.createElement('a'))
+          .attr('href',ex.handin).html('Hand in').appendTo(id_cell)
+        handin_anchor.addClass(
+          if ex.due > (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
+    else  
+      id_cell.html('{'+ex.id+':'+ex.type+'}')
     if /\S/.test(ex.name)
       name_cell = row.find('td.name').text(ex.name)
-      if ex.handin?
-        console.log ex.name
-        console.log ex.handin
-        name_cell.text(name_cell.text() + ' - ')
-        handin_anchor = $(document.createElement('a'))
-          .attr('href',ex.handin).html('Hand in').appendTo(name_cell)
-        handin_anchor.addClass(if ex.due > (new Date()) then 'handin_link' else 'late_handin')
     row.find('td.set').text(format_date ex.start)
     row.find('td.due').text(format_date ex.end)
     if ex.spec? 
