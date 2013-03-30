@@ -8,7 +8,22 @@
         %span.btn.exercise-navigation-btn{:id => "next_term_btn"}
           %i.icon-double-angle-right
 
-%table#exercises_template.hidden.module_table.table-striped.table-bordered
+#notes-modal.modal.hide.fade
+  .modal-header
+    %button{:type => "button", :class => "close", :"data-dismiss" => "modal", :"aria-hidden" => "true"} &times;
+    %h3#notes-modal-header Notes
+  .modal-body#notes-modal-body
+    %table.table.wide_table.table-striped.table-bordered
+      %thead
+        %tr
+          %th ID
+          %th Link
+      %tbody#notes-modal-tbody
+        %tr
+          %td
+          %td
+
+%table#exercises_template.table.wide_table.module_table.table-striped.table-bordered.hidden
   %tr
     %th ID
     %th Name
@@ -25,3 +40,4 @@
     %td.due NA
     %td.spec NA
     %td.given NA
+
