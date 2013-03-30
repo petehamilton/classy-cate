@@ -483,7 +483,7 @@ populate_notes = (notes_data, module) ->
   notes_body.html('')
   for note, i in notes_data.notes
     row = $('<tr/>')
-    row.append("<td>#{i}</td>")
+    row.append("<td>#{i+1}</td>")
     if note.type == "url"
       row.append("<td><a href='#{note.link}' target='_blank'>#{note.title}</a></td>")
     else
