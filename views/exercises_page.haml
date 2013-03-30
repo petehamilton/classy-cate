@@ -1,0 +1,27 @@
+.row
+  .span12
+    %h2
+      %span{:id => "term_title"} Timetable of Exercises
+      %div{:style => "display:inline; left:90%; margin-top:4px; position:absolute"}
+        %span.btn.exercise-navigation-btn{:id => "back_term_btn", :style => "margin-right:14px"}
+          %i.icon-double-angle-left
+        %span.btn.exercise-navigation-btn{:id => "next_term_btn"}
+          %i.icon-double-angle-right
+
+%table#exercises_template.hidden.module_table.table-striped.table-bordered
+  %tr
+    %th ID
+    %th Name
+    %th Set On
+    %th Due On
+    %th Spec Link
+    %th Given link
+
+%table
+  %tr#exercise_row_template.hidden
+    %td.id NA
+    %td.name NA
+    %td.set NA
+    %td.due NA
+    %td.spec NA
+    %td.given NA

@@ -6,8 +6,8 @@ require 'coffee-script'
 require 'less'
 require 'dalli'
 
-# Default 10 minute cache
-set :cache, Dalli::Client.new(nil, {:expires_in => 60*60*24})
+require './config/environments'
+require './config/cache'
 
 get '/' do
   redirect "https://github.com/PeterHamilton/classy-cate#classy-cate"
@@ -15,35 +15,19 @@ end
 
 # Asset Serving
 get '/classy-cate.user.js' do
-  send_file('views/classy_cate.user.js')
+  send_file('views/classy_cate.user.js') # TODO: Cache this first.
 end
 
 get '/classy-cate.js' do
-  begin
-    js = settings.cache.get('classy-cate-js')
-    if js.nil?
-      logger.info "Caching Classy CATE JS"
-      js = coffee(erb(:"classy_cate.coffee"))
-      settings.cache.set('classy-cate-js', js)
-    end
-  rescue *[Dalli::RingError, Dalli::NetworkError]
-    js = coffee(erb(:"classy_cate.coffee"))
-  end
-  js
+  get_cache('classy-cate-js', settings.asset_cache_for) {
+    coffee(erb(:"classy_cate.coffee"))
+  }
 end
 
 get '/classy-cate.css' do
-  begin
-    css = settings.cache.get('classy-cate-css')
-    if css.nil?
-      logger.info "Caching Classy CATE CSS"
-      css = less :classy_cate
-      settings.cache.set('classy-cate-css', css)
-    end
-  rescue *[Dalli::RingError, Dalli::NetworkError]
-    css = less :classy_cate
-  end
-  css
+  get_cache('classy-cate-css', settings.asset_cache_for) {
+    less :classy_cate
+  }
 end
 
 # Auto Deploy Methods

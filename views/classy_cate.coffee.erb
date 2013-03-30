@@ -5,8 +5,10 @@
 LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
 MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page).gsub("\n", "") %>'
 GRADES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :grades_page).gsub("\n", "") %>'
+EXERCISES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :exercises_page).gsub("\n", "") %>'
+PERIOD = null
 
-CLASSY_CATE_SCRIPT_VERSION = "1.1"
+CLASSY_CATE_SCRIPT_VERSION = "1.2"
 
 #///////////////////////////////////////////////////////////////////////////////
 # Helper Functions
@@ -50,6 +52,9 @@ load_cate_page = (url, callback) ->
 #///////////////////////////////////////////////////////////////////////////////
 # Code to extract details from pages
 #///////////////////////////////////////////////////////////////////////////////
+
+# CATE Homepage
+# html - A jQuery object representing the page body
 extract_main_page_data = (html) ->
   current_url = document.URL
   current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check
@@ -114,6 +119,163 @@ extract_main_page_data = (html) ->
     timetable_url: timetable_url
   }
 
+# Excercise Page
+# html - A jQuery object representing the page body
+extract_exercise_page_data = (html) ->
+
+  # Extracts full title e.g. Spring Term 2012-2013 
+  extract_term_title = (html) ->
+    html.find('tr').eq(0).find('h1').eq(0).text()
+
+  # Converts a CATE style date into a JS Date object
+  # e.g. '2013-1-7' -> Mon Jan 07 2013 00:00:00 GMT+0000 (GMT) 
+  parse_date = (input) ->
+    [year, month, day] = input.match(/(\d+)/g)
+    new Date(year, month - 1, day) # JS months index from 0
+
+  # Extracts the academic years applicable
+  # e.g. "Easter Period 2012-2013" -> ["2012", "2013"]
+  extract_academic_years = (body) ->
+    body.find('h1').text()[-9..].split('-')
+
+  extract_start_end_dates = (fullTable, years) ->
+
+    # Converts a month into an int (indexed from 1)
+    # e.g. "January" -> 1
+    # month - Month name as a capitalised string
+    month_to_int = (month) ->
+      months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                'August', 'September', 'October', 'November', 'December']
+      months.indexOf(month) + 1
+
+    # Extracts months from table row
+    # e.g. ["January", "February", "March"]
+    # table_row - The Timetable table row jQuery Object
+    extract_months = (table_row) ->
+      table_headers = ($(cell) for cell in table_row.find('th'))
+      month_cells = (c for c in table_headers when c.attr('bgcolor') == "white")
+      month_names = (c.text().replace(/\s+/g, '') for c in month_cells)
+      month_ids = month_names.map month_to_int
+      return month_ids
+
+    # Extracts days from table row
+    # e.g. ["1", "2", "3"]
+    # table_row - The Timetable table row jQuery Object
+    extract_days = (table_row) ->
+      table_headers = ($(cell) for cell in table_row.find('th'))
+      days_text = (c.text() for c in table_headers)
+      valid_days = (d for d in days_text when d.replace(/\s+/g, '') != '')
+      days_as_ints = valid_days.map parseInt
+      return days_as_ints
+
+    # TODO: What if the timetable crosses year boundaries?
+    #       e.g over new year/christmas?
+
+    [first_month, others..., last_month] = extract_months $(fullTable).find('tr').eq(0)
+    
+    year = if first_month < 9 then years[1] else years[0]
+
+    day_headers = $(fullTable).find('tr').eq(2).find('th')
+
+    col_buf = 0
+    col_buf += 1 while $(day_headers[col_buf]).is(":empty")
+
+    [first_day, others..., last_day] = extract_days $(fullTable).find('tr').eq(2)
+
+    return {  # remember _day in yyyy-mm-dd format
+      start: year + '-' + first_month + '-' + first_day
+      end: year + '-' + last_month + '-' + last_day
+      colBufferToFirst: col_buf - 1
+    }
+
+  # Extracts module details from a cell jQuery object
+  process_module_cell = (cell) ->
+    [id, name] = cell.text().split(' - ')
+    return {
+      id : id
+      name : name.replace(/^\s+|\s+$/g, '')
+      notesLink : cell.find('a').eq(0).attr('href')
+    }
+    
+  # Add the parsed exercises to the given module 
+  # module - the module to attach the exercises to
+  # exercise_cells - An array of cells (jQuery objects)
+  process_exercises_from_cells = (module, exercise_cells) -> 
+    if not exercise_cells? then return null
+    module.exercises ?= []
+
+    current_date = parse_date dates.start
+    current_date.setDate(current_date.getDate() - dates.colBufferToFirst)
+    for ex_cell in exercise_cells
+      colSpan = parseInt $(ex_cell).attr('colspan')
+      if $(ex_cell).attr('bgcolor')? and $(ex_cell).find('a').length != 0
+        [id, type] = $(ex_cell).find('b').eq(0).text().split(':')
+        hrefs = ($(anchor).attr('href') for anchor in $(ex_cell).find('a') when $(anchor).attr('href')?)
+        [mailto, spec, givens, handin] = [null, null, null, null]
+        for href in hrefs
+          if /mailto/i.test(href)
+            mailto = href
+          else if /SPECS/i.test(href)
+            spec = href
+          else if /given/i.test(href)
+            givens = href
+          else if /handins/i.test(href)
+            handin = href
+
+        end = new Date(current_date.getTime())
+        end.setDate(end.getDate() + colSpan - 1)
+        exercise_data = {
+          id : id, type : type, start : new Date(current_date.getTime())
+          end : end, moduleName : module.name
+          name : $(ex_cell).text()[(id.length + type.length + 2)..]
+          mailto : mailto, spec : spec, givens : givens, handin : handin
+        }
+        module.exercises.push(exercise_data)
+      current_date.setDate (current_date.getDate() + colSpan)
+
+  extract_module_exercise_data = (fullTable) ->
+
+    # Returns whether or not an element is a module container
+    # elem - jQuery element
+    is_module = (elem) ->
+      elem.find('font').attr('color') == "blue"
+
+    allRows = $(fullTable).find('tr')
+    modules = []
+    count = 0
+    while count < allRows.length
+      current_row = allRows[count]
+      following_row_count = 0
+      module_elem = $($(current_row).find('td').eq(1))
+      if is_module(module_elem)
+        module_data = process_module_cell module_elem
+
+        following_row_count = $(current_row).find('td').eq(0).attr('rowspan') - 1
+        following_rows = allRows[count+1..count+following_row_count]
+
+        exerciseCells = ($(row).find('td')[1..] for row in following_rows)
+        exerciseCells.push($(current_row).find('td')[4..])
+        exerciseCells = (cs for cs in exerciseCells when cs?)
+
+        process_exercises_from_cells(module_data, cells) for cells in exerciseCells
+
+        modules.push module_data
+      count += following_row_count + 1
+    return modules
+
+  term_title = extract_term_title html
+  timetable = (tb for tb in html.find('table') when $(tb).attr('border') == "0")
+  dates = extract_start_end_dates timetable, extract_academic_years html
+  modules = extract_module_exercise_data timetable
+  m.exercises.sort ((a,b) -> if a.start < b.start then -1 else 1) for m in modules
+  return {
+    modules : modules
+    start : dates.start, end : dates.end
+    term_title : term_title
+  }
+
+# Grades/Student Record Page
+# html - A jQuery object representing the page body
 extract_grades_page_data = (html) ->
   process_header_row = (row) ->
     # TODO: Regex out the fluff
@@ -219,6 +381,66 @@ populate_main_page = (vars) ->
   $('#cc-class-select').val(vars.default_class)
   $('#cc-period-select').val(vars.default_period)
 
+populate_exercises_page = (vars) ->
+
+  format_date = (d) ->
+    pad = (a,b) ->
+      (1e15+a+"").slice(-b)
+    pad(d.getDate(),2) + '/' + pad(d.getMonth()+1,2) + '/' + d.getFullYear()
+
+  populate_exercise_row = (row, ex) ->
+    id_cell = row.find('.id')
+    if ex.handin?
+        id_cell.html('')
+        handin_anchor = $(document.createElement('a'))
+          .attr('href',ex.handin).html('Hand in').appendTo(id_cell)
+        handin_anchor.addClass(
+          if ex.due > (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
+    else  
+      id_cell.html('{'+ex.id+':'+ex.type+'}')
+    if /\S/.test(ex.name)
+      name_cell = row.find('td.name').text(ex.name)
+      
+      if ex.handin?
+        name_cell.text(name_cell.text() + ' - ')
+        handin_anchor = $(document.createElement('a'))
+          .attr('href',ex.handin).html('Hand in').appendTo(name_cell)
+        handin_anchor.addClass(if ex.due > (new Date()) then 'handin_link' else 'late_handin')
+    row.find('td.set').text(format_date ex.start)
+    row.find('td.due').text(format_date ex.end)
+
+    if ex.spec? 
+      (specCell = row.find('.spec')).text('')
+      $(document.createElement('a')).attr('href',ex.spec).html('Spec Link').appendTo(specCell)
+
+    if ex.givens? 
+      givensCell = row.find('.given').text('')
+      $(document.createElement('a')).attr('href',ex.givens).html('Givens').appendTo(givensCell)
+
+  destination_div = $('#page-content')
+  modules = vars.modules
+  $('#term_title').text('Timetable - ' + vars.term_title)
+
+  for module in (m for m in modules when m.exercises[0]?) # Ignore empty modules
+    module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>')
+
+    if module.notesLink?
+      module_header.text(module_header.text() + " - ")
+      $('<a/>').attr('href', module.notesLink).html('Notes').appendTo(module_header)
+
+    module_table = $('#exercises_template').clone().removeClass('hidden').css('width','100%')
+    for exercise in module.exercises
+      row = $('#exercise_row_template').clone()
+      row.removeClass('hidden').appendTo(module_table)
+      populate_exercise_row row, exercise
+    destination_div.append(module_header).append(module_table)
+
+  $('#back_term_btn').bind 'click', ->
+      if PERIOD != 1 then load_exercises_page null, null, -1
+  $('#next_term_btn').bind 'click', ->
+      if PERIOD != 6 then load_exercises_page null, null, 1
+
+
 populate_grades_page = (vars) ->
 
   grade_to_class = (grade) ->
@@ -288,9 +510,7 @@ load_dashboard_page = (e) ->
   e.preventDefault() if e?
   window.location.hash = "dashboard"
   url = $('#nav-dashboard').attr('href')
-  console.log url
   load_cate_page url, (body) ->
-    console.log body
     main_page_vars = extract_main_page_data(body)
     populate_html('#page-content', MAIN_PAGE_HTML)
     populate_main_page(main_page_vars)
@@ -303,16 +523,59 @@ load_grades_page = (e) ->
     populate_html('#page-content', GRADES_PAGE_HTML)
     populate_grades_page(grade_page_vars)
 
+load_exercises_page = (e, fallback, shifting) ->
+
+  get_period_from_href = (href) ->
+    parseInt href.split('period=')[1][0]
+
+  alter_href_by = (href, i) ->
+    p = (get_period_from_href href)
+    href.replace(('period=' + p),('period=' + (p + i)))
+
+  isHoliday = (period) -> period%2 == 0
+
+  get_url_for_period = (p) ->
+    crrt = $('#nav-exercises').attr('href').split('period=')
+    crrt[0] + 'period=' + p + crrt[1][1..]
+
+  e.preventDefault() if e?
+  window.location.hash = "timetable"
+
+  href = $('#nav-exercises').attr('href')
+  if shifting?
+    PERIOD = PERIOD + shifting
+    href = get_url_for_period PERIOD
+  else if fallback?
+    href = alter_href_by href, (-1)
+  
+  PERIOD = get_period_from_href href
+  
+  load_cate_page href, (body) ->
+    exercise_page_vars = extract_exercise_page_data body
+    go_forth_and_multiply = true
+    if isHoliday(get_period_from_href href) and (not shifting?)
+      noOfExercises = 0
+      for m in exercise_page_vars.modules
+        noOfExercises += m.exs.length if m.exs?
+      if noOfExercises == '0'
+        go_forth_and_multiply = false
+        load_exercises_page e, true
+    if go_forth_and_multiply
+      populate_html('#page-content', EXERCISES_PAGE_HTML) 
+      populate_exercises_page(exercise_page_vars)
+
 load_css = ->
   # Let's Bootstrap this shizzle. Files from http://www.bootstrapcdn.com/?v=01282013154951
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
-  $('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
+  #$('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="https://localhost:4567/classy-cate.css" type="text/css" />');
+
 
 initial_load = ->
   current_url = document.URL
   if /personal/i.test(current_url)
-    load_css()
+    load_css()  
     hash = (window.location.hash).replace('#', '')
 
     main_page_vars = extract_main_page_data($('body'))
@@ -321,10 +584,14 @@ initial_load = ->
 
     if hash == "grades"
       load_grades_page()
+    else if hash == "timetable"
+      load_exercises_page()
     else
       load_dashboard_page()
   else if /student/i.test(current_url)
     window.location = "/#grades"
+  else if /timetable/i.test(current_url)
+    window.location = "/#timetable"
   else
     cate_notice = $('<div>Classy CATE hasn\'t been implemented for this page yet<br/><a href="https://github.com/PeterHamilton/classy-cate">Implement it!</a></div>')
     cate_notice.attr('style', 'padding: 20px; margin-bottom: 20px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); border: 3px solid #eed3d7; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #b94a48; background-color: #f2dede; font-size: 18px; text-align: center;')

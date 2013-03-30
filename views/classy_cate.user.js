@@ -2,13 +2,14 @@
 // @name         Classy CATE
 // @author       Peter Hamilton
 // @description  CATE Hurts eyes. This makes it hurt them less.
-// @version 1.1
+// @version 1.2
 // @match https://cate.doc.ic.ac.uk/*
 // ==/UserScript==
 
 function main() {
-    window.classy_cate_script_version = "1.1";
+    window.classy_cate_script_version = "1.2";
     $('head').append('<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>');
+    //$('head').append('<script type="text/javascript" src="https://localhost:4567/classy-cate.js"></script>');  //testing
     $('head').append('<script type="text/javascript" src="https://classy-cate.herokuapp.com/classy-cate.js"></script>');
 }
 
