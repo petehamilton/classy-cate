@@ -15,7 +15,9 @@ end
 
 # Asset Serving
 get '/classy-cate.user.js' do
-  send_file('views/classy_cate.user.js') # TODO: Cache this first.
+  get_cache('classy-cate-user-js', settings.asset_cache_for) {
+    erb(:"classy_cate.user.js")
+  }
 end
 
 get '/classy-cate.js' do

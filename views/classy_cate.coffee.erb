@@ -8,7 +8,7 @@ GRADES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :grades_page).gsub("\n", ""
 EXERCISES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :exercises_page).gsub("\n", "") %>'
 PERIOD = null
 
-CLASSY_CATE_SCRIPT_VERSION = "1.2"
+CLASSY_CATE_SCRIPT_VERSION = "<%= settings.userscript_version %>"
 
 #///////////////////////////////////////////////////////////////////////////////
 # Helper Functions
