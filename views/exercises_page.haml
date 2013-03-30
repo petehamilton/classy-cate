@@ -2,10 +2,11 @@
   .span12
     %h2
       %span{:id => "term_title"} Timetable of Exercises
-      %span.btn.exercise-navigation-btn{:id => "back_term_btn"}
-        %i.icon-double-angle-left
-      %span.btn.exercise-navigation-btn{:id => "next_term_btn"}
-        %i.icon-double-angle-right
+      %div{:style => "display:inline; left:90%; margin-top:4px; position:absolute"}
+        %span.btn.exercise-navigation-btn{:id => "back_term_btn", :style => "margin-right:14px"}
+          %i.icon-double-angle-left
+        %span.btn.exercise-navigation-btn{:id => "next_term_btn"}
+          %i.icon-double-angle-right
 
 %table#exercises_template.hidden.module_table.table-striped.table-bordered
   %tr
