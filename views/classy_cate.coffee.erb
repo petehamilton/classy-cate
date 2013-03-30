@@ -123,12 +123,12 @@ extract_main_page_data = (html) ->
 # html - A jQuery object representing the page body
 extract_exercise_page_data = (html) ->
 
-  # Extracts full title e.g. Spring Term 2012-2013 
+  # Extracts full title e.g. Spring Term 2012-2013
   extract_term_title = (html) ->
     html.find('tr').eq(0).find('h1').eq(0).text()
 
   # Converts a CATE style date into a JS Date object
-  # e.g. '2013-1-7' -> Mon Jan 07 2013 00:00:00 GMT+0000 (GMT) 
+  # e.g. '2013-1-7' -> Mon Jan 07 2013 00:00:00 GMT+0000 (GMT)
   parse_date = (input) ->
     [year, month, day] = input.match(/(\d+)/g)
     new Date(year, month - 1, day) # JS months index from 0
@@ -172,7 +172,7 @@ extract_exercise_page_data = (html) ->
     #       e.g over new year/christmas?
 
     [first_month, others..., last_month] = extract_months $(fullTable).find('tr').eq(0)
-    
+
     year = if first_month < 9 then years[1] else years[0]
 
     day_headers = $(fullTable).find('tr').eq(2).find('th')
@@ -196,11 +196,11 @@ extract_exercise_page_data = (html) ->
       name : name.replace(/^\s+|\s+$/g, '')
       notesLink : cell.find('a').eq(0).attr('href')
     }
-    
-  # Add the parsed exercises to the given module 
+
+  # Add the parsed exercises to the given module
   # module - the module to attach the exercises to
   # exercise_cells - An array of cells (jQuery objects)
-  process_exercises_from_cells = (module, exercise_cells) -> 
+  process_exercises_from_cells = (module, exercise_cells) ->
     if not exercise_cells? then return null
     module.exercises ?= []
 
@@ -273,6 +273,35 @@ extract_exercise_page_data = (html) ->
     start : dates.start, end : dates.end
     term_title : term_title
   }
+
+
+# Notes Page for Module
+# html - A jQuery object representing the page body
+extract_notes_page_data = (html) ->
+
+  process_notes_rows = (html) ->
+    html.find('table [cellpadding="3"]').find('tr')[1..]
+
+  notes = []
+  for row in ($(r) for r in process_notes_rows html)
+    title = row.find('td:eq(1)').text()
+    link = $(row.find('td:eq(1) a'))
+    if link.attr('href')? && link.attr('href') != ''
+      notes.push {
+        type: "resource"
+        title: title
+        link: link.attr('href')
+      }
+    else if link.attr('onclick')? # Remote page
+      identifier = link.attr('onclick').match(/clickpage\((.*)\)/)[1]
+      href = "showfile.cgi?key=2012:3:#{identifier}:c3:NOTES:peh10"
+      notes.push {
+        type: "url"
+        title : title
+        link : href
+      }
+
+  return { notes: notes }
 
 # Grades/Student Record Page
 # html - A jQuery object representing the page body
@@ -396,11 +425,11 @@ populate_exercises_page = (vars) ->
           .attr('href',ex.handin).html('Hand in').appendTo(id_cell)
         handin_anchor.addClass(
           if ex.due > (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
-    else  
+    else
       id_cell.html('{'+ex.id+':'+ex.type+'}')
     if /\S/.test(ex.name)
       name_cell = row.find('td.name').text(ex.name)
-      
+
       if ex.handin?
         name_cell.text(name_cell.text() + ' - ')
         handin_anchor = $(document.createElement('a'))
@@ -409,11 +438,11 @@ populate_exercises_page = (vars) ->
     row.find('td.set').text(format_date ex.start)
     row.find('td.due').text(format_date ex.end)
 
-    if ex.spec? 
+    if ex.spec?
       (specCell = row.find('.spec')).text('')
       $(document.createElement('a')).attr('href',ex.spec).html('Spec Link').appendTo(specCell)
 
-    if ex.givens? 
+    if ex.givens?
       givensCell = row.find('.given').text('')
       $(document.createElement('a')).attr('href',ex.givens).html('Givens').appendTo(givensCell)
 
@@ -425,10 +454,17 @@ populate_exercises_page = (vars) ->
     module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>')
 
     if module.notesLink?
-      module_header.text(module_header.text() + " - ")
-      $('<a/>').attr('href', module.notesLink).html('Notes').appendTo(module_header)
+      note_link = $('<a/>').attr('href',module.notesLink).html('Notes')
+      note_link.bind 'click', (e) ->
+          e.preventDefault()
+          url = $(this).attr 'href'
+          load_cate_page url, (body) ->
+            notes_data = extract_notes_page_data(body)
+            populate_notes(notes_data, module)
+            $("#notes-modal").modal('show')
+      module_header.text(module_header.text() + " - ").append(note_link)
 
-    module_table = $('#exercises_template').clone().removeClass('hidden').css('width','100%')
+    module_table = $('#exercises_template').clone().removeClass('hidden')
     for exercise in module.exercises
       row = $('#exercise_row_template').clone()
       row.removeClass('hidden').appendTo(module_table)
@@ -439,6 +475,20 @@ populate_exercises_page = (vars) ->
       if PERIOD != 1 then load_exercises_page null, null, -1
   $('#next_term_btn').bind 'click', ->
       if PERIOD != 6 then load_exercises_page null, null, 1
+
+populate_notes = (notes_data, module) ->
+  module_title = 'Notes for ' + module.id + ' - ' + module.name
+  $("#notes-modal-header").text module_title
+  notes_body = $("#notes-modal-tbody")
+  notes_body.html('')
+  for note, i in notes_data.notes
+    row = $('<tr/>')
+    row.append("<td>#{i}</td>")
+    if note.type == "url"
+      row.append("<td><a href='#{note.link}' target='_blank'>#{note.title}</a></td>")
+    else
+      row.append("<td><a href='#{note.link}'>#{note.title}</a></td>")
+    notes_body.append(row)
 
 
 populate_grades_page = (vars) ->
@@ -547,9 +597,9 @@ load_exercises_page = (e, fallback, shifting) ->
     href = get_url_for_period PERIOD
   else if fallback?
     href = alter_href_by href, (-1)
-  
+
   PERIOD = get_period_from_href href
-  
+
   load_cate_page href, (body) ->
     exercise_page_vars = extract_exercise_page_data body
     go_forth_and_multiply = true
@@ -557,11 +607,11 @@ load_exercises_page = (e, fallback, shifting) ->
       noOfExercises = 0
       for m in exercise_page_vars.modules
         noOfExercises += m.exs.length if m.exs?
-      if noOfExercises == '0'
+      if noOfExercises == 0
         go_forth_and_multiply = false
-        load_exercises_page e, true
+        load_exercises_page e, true, null
     if go_forth_and_multiply
-      populate_html('#page-content', EXERCISES_PAGE_HTML) 
+      populate_html('#page-content', EXERCISES_PAGE_HTML)
       populate_exercises_page(exercise_page_vars)
 
 load_css = ->
@@ -574,7 +624,7 @@ load_css = ->
 initial_load = ->
   current_url = document.URL
   if /personal/i.test(current_url)
-    load_css()  
+    load_css()
     hash = (window.location.hash).replace('#', '')
 
     main_page_vars = extract_main_page_data($('body'))
