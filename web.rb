@@ -8,13 +8,14 @@ require 'dalli'
 
 require './config/environments'
 require './config/cache'
+require './config/version'
 
 get '/' do
   redirect "https://github.com/PeterHamilton/classy-cate#classy-cate"
 end
 
 # Asset Serving
-get '/classy-cate.user.js' do
+get '`' do
   get_cache('classy-cate-user-js', settings.asset_cache_for) {
     erb(:"classy_cate.user.js")
   }
