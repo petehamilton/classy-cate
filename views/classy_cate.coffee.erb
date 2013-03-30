@@ -558,8 +558,8 @@ load_exercises_page = (e, fallback, shifting) ->
     go_forth_and_multiply = true
     if isHoliday(get_period_from_href href) and (not shifting?)
       noOfExercises = 0
-      noOfExercises += 
-        (if m.exs? then m.exs.length else 0) for m in exercise_page_vars.modules
+      for m in exercise_page_vars.modules
+        noOfExercises += m.exs.length if m.exs?
       if noOfExercises == '0'
         go_forth_and_multiply = false
         load_exercises_page e, true
