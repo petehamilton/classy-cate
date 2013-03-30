@@ -436,9 +436,9 @@ populate_exercises_page = (vars) ->
     destination_div.append(module_header).append(module_table)
 
   $('#back_term_btn').bind 'click', ->
-      load_exercises_page null, null, -1
+      if PERIOD != 1 then load_exercises_page null, null, -1
   $('#next_term_btn').bind 'click', ->
-      load_exercises_page null, null, 1
+      if PERIOD != 6 then load_exercises_page null, null, 1
 
 
 populate_grades_page = (vars) ->
@@ -572,7 +572,7 @@ load_css = ->
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
   #$('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
-  $('head').append('<link rel="stylesheet" href="http://localhost:4567/classy-cate.css" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="https://localhost:4567/classy-cate.css" type="text/css" />');
 
 
 initial_load = ->
