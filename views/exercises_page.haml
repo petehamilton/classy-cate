@@ -1,8 +1,11 @@
 .row
   .span12
-    %h2{:id => "term_title"} 
-      Timetable of Exercises
-
+    %h2
+      %span{:id => "term_title"} Timetable of Exercises
+      %span.btn.exercise-navigation-btn{:id => "back_term_btn"}
+        %i.icon-double-angle-left
+      %span.btn.exercise-navigation-btn{:id => "next_term_btn"}
+        %i.icon-double-angle-right
 
 %table#exercises_template.hidden.module_table.table-striped.table-bordered
   %tr
