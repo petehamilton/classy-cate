@@ -461,13 +461,12 @@ populate_exercises_page = (vars) ->
     module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>')
 
     if module.notesLink?
-      note_link = $('<a/>').attr('href',module.notesLink)
-        .html('Notes').bind 'click', (e) ->
+      note_link = $('<a/>').attr('href',module.notesLink).html('Notes')
+      note_link.bind 'click', (e) ->
           e.preventDefault()
           href = $(this).attr 'href'
-          populate_notes_div (load_cate_page href, extract_notes_page_data)
+          populate_notes_div(load_cate_page href, extract_notes_page_data)
       module_header.text(module_header.text() + " - ").append(note_link)
-      #attr('href', module.notesLink)
 
     module_table = $('#exercises_template').clone().removeClass('hidden').css('width','100%')
     for exercise in module.exercises
