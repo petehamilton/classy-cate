@@ -22,25 +22,31 @@ CATE, without ~~the~~ as much hurt.
 
 ## Rough TODO List (Please Help)
 
-- **Timetable page**
+- **Make Timetable Page smoother/prettier**
 - Scrub last vestige of CATE from homepage - the favicon! Use [this](http://stackoverflow.com/questions/260857/changing-website-favicon-dynamically/260876#260876)
 - Non-Undergrads may experience missing/broken links. I have no idea.
 
 ## Ideas
 
-- Scrape Timetable page
-  - Put below current interface
+- Timetable page
+  - Work on condensed version for dashboard
   - Notify of upcoming deadlines
-  - Aggregate links to notes, exercises without jumping around a huge table
+  - Aggregate links to notes, exercises without jumping around a huge
+  table, possibly include a download all function?
 
 ## Development
 
 To develop and help improve classy-cate, do the following:
 
-1. Run the server with `thin start --ssl`
-2. Modify `classy-cate.user.js` js/css references to refer to the local python server e.g. `https://raw.github.com/PeterHamilton/classy-cate/master/ -> https://localhost:3000/classy-cate.css`
-3. Install your modified `classy-cate.user.js` as an Userscript/Greasemonkey extension in Chrome/Firefox.
-4. Modify `views/classy-cate.js` and `views/classy-cate.less`
+1. Run the server with `thin start -p 4567 --ssl`
+2. Modify `classy-cate.user.js` to point to your local server assets
+3. Modify `views/classy_cate.coffee.erb` and `views/classy_cate.less` to add/modify functionality as you wish!
+
+## Want to help, but don't have a clue?
+
+Hopefully some first years will want to contribute to this project. If
+you're one of them, but are put off by what seems like a stupid amount
+of complexity just to get it working, then have a look at [this](https://github.com/lmj112/classy-cate/wiki/Getting-off-the-Ground-for-Development) page to get you started.
 
 
 ## References
