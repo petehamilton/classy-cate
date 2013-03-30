@@ -293,7 +293,7 @@ extract_notes_page_data = (html) ->
         link: link.attr('href')
       }
     else if link.attr('onclick')? # Remote page
-      identifier = 341
+      identifier = link.attr('onclick').match(/clickpage\((.*)\)/)[1]
       href = "showfile.cgi?key=2012:3:#{identifier}:c3:NOTES:peh10"
       notes.push {
         type: "url"
@@ -484,7 +484,10 @@ populate_notes = (notes_data, module) ->
   for note, i in notes_data.notes
     row = $('<tr/>')
     row.append("<td>#{i}</td>")
-    row.append("<td><a href='#{note.link}'>#{note.title}</a></td>")
+    if note.type == "url"
+      row.append("<td><a href='#{note.link}' target='_blank'>#{note.title}</a></td>")
+    else
+      row.append("<td><a href='#{note.link}'>#{note.title}</a></td>")
     notes_body.append(row)
 
 
