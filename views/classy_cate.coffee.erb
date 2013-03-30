@@ -6,6 +6,7 @@ LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
 MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page).gsub("\n", "") %>'
 GRADES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :grades_page).gsub("\n", "") %>'
 EXERCISES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :exercises_page).gsub("\n", "") %>'
+PERIOD = null
 
 CLASSY_CATE_SCRIPT_VERSION = "1.2"
 
@@ -522,7 +523,6 @@ load_grades_page = (e) ->
     populate_html('#page-content', GRADES_PAGE_HTML)
     populate_grades_page(grade_page_vars)
 
-<<<<<<< HEAD
 load_exercises_page = (e, fallback, shifting) ->
 
   get_period_from_href = (href) ->
@@ -532,37 +532,31 @@ load_exercises_page = (e, fallback, shifting) ->
     p = (get_period_from_href href)
     href.replace(('period=' + p),('period=' + (p + i)))
 
-=======
-load_exercises_page = (e, fallback) ->
-
-  # Return true if the given period falls on a holiday
->>>>>>> e2a4917a680e62e9315d3fd493b9fd97fbdd596e
   isHoliday = (period) -> period%2 == 0
+
+  get_url_for_period = (p) ->
+    crrt = $('#nav-exercises').attr('href').split('period=')
+    crrt[0] + 'period=' + p + crrt[1][1..]
 
   e.preventDefault() if e?
   window.location.hash = "timetable"
 
   href = $('#nav-exercises').attr('href')
-<<<<<<< HEAD
   if shifting?
-    href = alter_href_by window.location.href, shifting
+    console.log "We're shifting!"
+    PERIOD = PERIOD + shifting
+    console.log 'Period is ' + PERIOD
+    href = get_url_for_period PERIOD
+    console.log href
   else if fallback?
     href = alter_href_by href, (-1)
-
-=======
-  period = parseInt href.split('period=')[1][0]
-  if fallback?
-    href = href.replace(('period=' + period),('period=' + (period - 1)))
-    
->>>>>>> e2a4917a680e62e9315d3fd493b9fd97fbdd596e
+  
+  PERIOD = get_period_from_href href
+  
   load_cate_page href, (body) ->
     exercise_page_vars = extract_exercise_page_data body
     go_forth_and_multiply = true
-    if shifting?
-      href = alter_href_by href, shifting
-      load_exercises_page e, null, null
-      go_forth_and_multiply = false
-    else if isHoliday(get_period_from_href href)
+    if isHoliday(get_period_from_href href) and (not shifting?)
       noOfExercises = 0
       noOfExercises += 
         (if m.exs? then m.exs.length else 0) for m in exercise_page_vars.modules
@@ -577,8 +571,8 @@ load_css = ->
   # Let's Bootstrap this shizzle. Files from http://www.bootstrapcdn.com/?v=01282013154951
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
-  $('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
-  $('head').append('<link rel="stylesheet" href="https://localhost:4567/classy-cate.css" type="text/css" />');
+  #$('head').append('<link rel="stylesheet" href="https://classy-cate.herokuapp.com/classy-cate.css" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="http://localhost:4567/classy-cate.css" type="text/css" />');
 
 
 initial_load = ->
