@@ -543,11 +543,8 @@ load_exercises_page = (e, fallback, shifting) ->
 
   href = $('#nav-exercises').attr('href')
   if shifting?
-    console.log "We're shifting!"
     PERIOD = PERIOD + shifting
-    console.log 'Period is ' + PERIOD
     href = get_url_for_period PERIOD
-    console.log href
   else if fallback?
     href = alter_href_by href, (-1)
   
