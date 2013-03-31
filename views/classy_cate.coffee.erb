@@ -455,7 +455,7 @@ populate_exercises_page = (vars) ->
           url = $(this).attr 'href'
           load_cate_page url, (body) ->
             notes_data = extract_notes_page_data(body)
-            populate_notes(notes_data, module)
+            populate_notes(notes_data)
             $("#notes-modal").modal('show')
       module_header.text(module_header.text() + " - ").append(note_link)
 
@@ -471,9 +471,7 @@ populate_exercises_page = (vars) ->
   $('#next_term_btn').bind 'click', ->
       if PERIOD != 6 then load_exercises_page null, null, 1
 
-populate_notes = (notes_data, module) ->
-  module_title = 'Notes for ' + module.id + ' - ' + module.name
-  $("#notes-modal-header").text module_title
+populate_notes = (notes_data) ->
   notes_body = $("#notes-modal-tbody")
   notes_body.html('')
   for note, i in notes_data.notes
