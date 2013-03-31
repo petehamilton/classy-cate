@@ -15,7 +15,7 @@ get '/' do
 end
 
 # Asset Serving
-get '`' do
+get '/classy-cate.user.js' do
   get_cache('classy-cate-user-js', settings.asset_cache_for) {
     erb(:"classy_cate.user.js")
   }
