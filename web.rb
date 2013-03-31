@@ -35,7 +35,7 @@ end
 
 get '/timeline.js' do
   get_cache('timeline-js', settings.asset_cache_for) {
-    coffee(:"timeline.coffee")
+    coffee(:"timeline")
   }
 end
 
