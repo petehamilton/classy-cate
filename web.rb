@@ -33,6 +33,12 @@ get '/classy-cate.css' do
   }
 end
 
+get '/timeline.js' do
+  get_cache('timeline-js', settings.asset_cache_for) {
+    coffee(:"timeline.coffee")
+  }
+end
+
 # Auto Deploy Methods
 get '/public_key' do
   require_relative 'lib/init'
