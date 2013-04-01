@@ -1,3 +1,4 @@
 *.crt
 *.key
 .DS_Store
+compile.sh
