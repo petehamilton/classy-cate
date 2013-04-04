@@ -134,11 +134,8 @@ td.set, td.due, td.spec, td.given {
 }
 
 div .interval {
-  width : 1px;
-  position : absolute;
-  background-color : black;
-  margin-top:-2px;
-  top:0;
+  position : absolute; top : 0;
+  margin-top : 0; height : 0; 
 }
 
 .timelineContainer .infoBox {
@@ -157,6 +154,28 @@ div .interval {
   a, .title {
     font-weight : bold;
   }
+}
+
+.due_wire {
+  position : absolute; background-color : black;
+  -webkit-box-shadow: 0 0 2px red;
+  -moz-box-shadow : 0 0 2px red; boxShadow: 0 0 2px red;
+}
+
+.duration {
+  height : 2; width : 0; position : absolute; zIndex : 5;
+}
+
+.intMarker {
+  margin-top : -20px; width : 40px; margin-left : -20px; text-align : center;
+  height : auto; font-size : 7px; position : absolute;
+}
+
+.spine {
+  position : absolute;
+  width : 0; height : 1px;
+  top : 50%; 
+  backgroundColor : black
 }
 
 .timelineContainer .infoBox:hover {
