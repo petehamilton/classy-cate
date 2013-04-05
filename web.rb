@@ -39,6 +39,12 @@ get '/timeline.js' do
   }
 end
 
+get '/timeline.css' do
+  get_cache('timeline-css', settings.asset_cache_for) {
+    less :timeline
+  }
+end
+
 # Auto Deploy Methods
 get '/public_key' do
   require_relative 'lib/init'

@@ -1,0 +1,103 @@
+/* Basic styling for the timeline container */
+.timeline_container {
+	position : absolute; background-color : white; 
+	min-height : 150px; width : 100%;
+}
+
+/* Styling for the timeline spine */
+.spine {
+	position : absolute; height : 1px; top : 50%;
+	background-color : black;
+}
+
+.origin {cursor : pointer;}
+
+/* Styling for all circles, need absolute and default 10 z-index */
+.circle {
+	position : absolute; 
+	z-index : 10; top : 0;
+}
+	.circle.end { z-index : 11 }
+
+/* Styling for the interval markers */
+.interval_marker {
+	position : absolute; top : 0;
+	background-color: black;
+}
+	.interval_marker.p3 {
+		width:3px; height:19px;
+		margin-left : -1px; margin-top : -9px; 
+	}
+	.interval_marker.p2 {
+		width:2px; height:11px;
+		margin-left : -1px; margin-top : -5px; 
+
+	}
+	.interval_marker.p1 {
+		width:1px; height:5px;
+		margin-top : -2px; 
+	}
+
+/* Styling for the interval marker labels, Mon 1st, Jan, etc */
+.interval_label {
+	position : absolute; text-align : center; top : 6px;
+	font-size: 7px; width : 30px; margin-left : -15px;
+}
+	.interval_label.p3 {
+		margin-top : -31px; font-weight: bold; font-size : 9px;
+	}
+	.interval_label.p2 {
+		margin-top : -25px;
+	}
+
+.info_elem {
+	font-size : 10px; text-align : left;
+	font-family : 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+	.info_elem.collapsed {
+		font-weight : bold;
+	}
+	.info_elem.collapsed.expanded {
+		margin-bottom: -5px;
+	}
+	
+.wire {
+	background-color: black;
+	position : absolute; z-index : 9; 
+	/* behind circles and info_box */
+	top : 0px; left : 0px; height : 0px; width : 0px;
+	/* ^ initial values */
+}
+	.wire.vertical { /* for both vertical and horizontal */
+		width : 2px;
+	}
+	.wire.horizontal {
+		height : 2px;
+	}
+	.wire.start {
+		-webkit-box-shadow : 0 0 2px blue;
+		-mox-box-shadow : 0 0 2px blue;
+		box-shadow : 0 0 2px blue;
+	}
+	.wire.end, .wire.duration {
+		background-color : #E0524E;
+	}
+
+.info_box {
+	position : absolute; text-align : center;
+	border-radius : 4px; display : inline-block;
+	padding : 2px; border : 1px solid #636363;
+	z-index : 15; -moz-box-shadow: 0 0 3px grey; 
+	box-shadow : 0 0 3px grey; cursor : pointer; 
+	-webkit-box-shadow : 0 0 3px grey; line-height: 20px;
+	background-color : #fcfcfc; white-space : nowrap;
+	height : auto; width : auto;
+}
+
+.info_elem.collapsed {
+	display : inline-block;
+}
+
+.info_elem.expanded {
+	display : inline-block;
+}

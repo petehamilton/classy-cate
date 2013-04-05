@@ -477,18 +477,18 @@ populate_exercises_page = (vars) ->
     destination_div.append(module_header).append(module_table)
 
     structure = {
-    title : ['id','type']
-    extendedTitle : ['name']
-    content :
-      names : ['HAND IN', 'SPEC', 'GIVENS']
-      links : ['handin', 'spec', 'givens']
+      title : ['id','type']
+      extendedTitle : ['name']
+      content :
+        names : ['HAND IN', 'SPEC', 'GIVENS']
+        keys : ['handin', 'spec', 'givens']
     }
 
     if module.id == '113' 
       console.log 'here we go'
       console.log vars.start + ' ' + vars.end + ' ' + module.exercises.length
-      createTimeline
-        start : vars.start, end : vars.end, container : destination_div
+      create_timeline
+        start_date : vars.start, end_date : vars.end, destination : $('html')
         structure : structure, moments : module.exercises
 
   $('#back_term_btn').bind 'click', ->
