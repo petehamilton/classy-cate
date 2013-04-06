@@ -1,23 +1,21 @@
 /* Basic styling for the timeline container */
 .timeline_container {
-	position : absolute; background-color : white; 
+	position : relative; background-color : white; 
 	min-height : 150px; width : 100%;
+	font-family : 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 /* Styling for the timeline spine */
 .spine {
 	position : absolute; height : 1px; top : 50%;
 	background-color : black;
-}
-
-.origin {cursor : pointer;}
+} .origin {cursor : pointer;}
 
 /* Styling for all circles, need absolute and default 10 z-index */
 .circle {
 	position : absolute; 
 	z-index : 10; top : 0;
-}
-	.circle.end { z-index : 11 }
+}.circle.end { z-index : 11 }
 
 /* Styling for the interval markers */
 .interval_marker {
@@ -31,7 +29,6 @@
 	.interval_marker.p2 {
 		width:2px; height:11px;
 		margin-left : -1px; margin-top : -5px; 
-
 	}
 	.interval_marker.p1 {
 		width:1px; height:5px;
@@ -41,13 +38,19 @@
 /* Styling for the interval marker labels, Mon 1st, Jan, etc */
 .interval_label {
 	position : absolute; text-align : center; top : 6px;
-	font-size: 7px; width : 30px; margin-left : -15px;
+	font-size: 7px; width : 30px; margin-left : -15px; z-index : 50;
+	line-height : normal;
+
 }
 	.interval_label.p3 {
 		margin-top : -31px; font-weight: bold; font-size : 9px;
+		background-color : white; -webkit-box-shadow : 0 0 2px 1px white; 
+		box-shadow : 0 0 2px 1px white; -moz-box-shadow : 0 0 2px 1px white; 
 	}
 	.interval_label.p2 {
 		margin-top : -25px;
+		background-color : white; -webkit-box-shadow : 0 0 3px 2px white; 
+		box-shadow : 0 0 2px 1px white; -moz-box-shadow : 0 0 2px 1px white;
 	}
 
 .info_elem {

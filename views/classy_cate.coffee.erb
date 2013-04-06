@@ -488,7 +488,7 @@ populate_exercises_page = (vars) ->
       console.log 'here we go'
       console.log vars.start + ' ' + vars.end + ' ' + module.exercises.length
       create_timeline
-        start_date : vars.start, end_date : vars.end, destination : $('html')
+        start_date : vars.start, end_date : vars.end, destination : destination_div
         structure : structure, moments : module.exercises
 
   $('#back_term_btn').bind 'click', ->
@@ -639,6 +639,7 @@ load_css = ->
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
   $('head').append('<link rel="stylesheet" href="<%= settings.cc_css_url %>" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="<%= settings.tl_css_url %>" type="text/css" />')
 
 
 initial_load = ->
