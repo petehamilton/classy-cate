@@ -2,3 +2,5 @@
 *.key
 .DS_Store
 compile.sh
+copyTl.sh
+timeline.coffee.sym

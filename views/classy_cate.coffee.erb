@@ -311,6 +311,12 @@ extract_notes_page_data = (html) ->
 
   return { notes: notes }
 
+# Givens Page for Exercise
+# html - A jQuery object representing the page body
+extract_givens_page_data = (html) ->
+
+
+
 # Grades/Student Record Page
 # html - A jQuery object representing the page body
 extract_grades_page_data = (html) ->
@@ -459,15 +465,19 @@ populate_exercises_page = (vars) ->
     module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>')
 
     if module.notesLink?
-      note_link = $('<a/>').attr('href',module.notesLink).html('Notes')
+      note_link = $('<a/>').attr('href', module.notesLink).html('Notes')
+        .data('module_title',module_header.text())  # Save title link for modal
+
       note_link.bind 'click', (e) ->
           e.preventDefault()
           url = $(this).attr 'href'
+          $('#active_note').attr 'id', ''
+          $(this).attr 'id', 'active_note'
           load_cate_page url, (body) ->
             notes_data = extract_notes_page_data(body)
-            populate_notes(notes_data)
+            populate_notes(notes_data, $('#active_note').data('module_title'))
             $("#notes-modal").modal('show')
-      module_header.text(module_header.text() + " - ").append(note_link)
+      module_header.append(" - ").append(note_link)
 
     module_table = $('#exercises_template').clone().removeClass('hidden')
     for exercise in module.exercises
@@ -497,7 +507,11 @@ populate_exercises_page = (vars) ->
       if PERIOD != 6 then load_exercises_page null, null, 1
 
 
-populate_notes = (notes_data) ->
+populate_notes = (notes_data, header) ->
+  notes_header = $('#notes-modal-header')
+  notes_header.find('h3').remove()
+  console.log header
+  notes_header.append("<h3>#{header}</h3>")
   notes_body = $("#notes-modal-tbody")
   notes_body.html('')
   for note, i in notes_data.notes
