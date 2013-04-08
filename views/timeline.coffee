@@ -15,34 +15,37 @@
 #/////////////// © 2013 Lawrence Jones All Rights Reserved ////////////////////
 
 #//////////////////////////////////////////////////////////////////////////////
-# DEFINE THE GLOBAL SETTINGS OBJECT
+# DEFINE THE SETTINGS OBJECT
 #//////////////////////////////////////////////////////////////////////////////
 # It's worth noting that all percentages are returned as floating point. Any
 # use of the return as a setting will require % appended to the result.
 
-SETTINGS = {  # All lefts are percentages
-  container : null, spine : null
-  start_date : null, end_date : null
-  intervals : [], no_of_intervals : 0
-  structure : {}, moments : []
-  pct_buffer_for_markers : 3, spine_buffer : 5
-  initial_heights :
-      up   : [-14, -30, -38]
-      down : [  8,  10,  14]
+SETTINGS = null
 
-  # Return the marker index of the given date
-  date_to_marker_index : (d) ->
-    Math.floor (d-@start_date)/(1000*60*60*24)
+default_settings = ->
+  SETTINGS = {  # All lefts are percentages
+    container : null, spine : null
+    start_date : null, end_date : null
+    intervals : [], no_of_intervals : 0
+    structure : {}, moments : []
+    pct_buffer_for_markers : 3, spine_buffer : 5
+    initial_heights :
+        up   : [-14, -30, -38]
+        down : [  8,  10,  14]
 
-  # Return the percentage increment between each interval
-  pct_per_interval : -> 
-    (100 - @pct_buffer_for_markers) / (@intervals.length - 1)
+    # Return the marker index of the given date
+    date_to_marker_index : (d) ->
+      Math.floor (d-@start_date)/(1000*60*60*24)
 
-  # Return the left percentage (as float) of the given date
-  date_to_marker_left_pct : (d) ->
-    (@pct_buffer_for_markers + @pct_per_interval()*
-      (@date_to_marker_index parse_date(d)))
-}
+    # Return the percentage increment between each interval
+    pct_per_interval : -> 
+      (100 - @pct_buffer_for_markers) / (@intervals.length - 1)
+
+    # Return the left percentage (as float) of the given date
+    date_to_marker_left_pct : (d) ->
+      (@pct_buffer_for_markers + @pct_per_interval()*
+        (@date_to_marker_index parse_date(d)))
+  }
 
 # Expose the createTimeline function to the window object, allowing access from
 # external scripts. From this function, process the creation of the timeline
@@ -55,18 +58,32 @@ window.create_timeline = (opt) ->
     script.setAttribute('src',jQuery_link)
     document.body.appendChild(script)
     console.log 'Adding jQuery'
-  if not  (opt.destination? && 
-          (SETTINGS.start_date = parse_date(opt.start_date))? &&  
-          (SETTINGS.end_date = parse_date(opt.end_date))?)
+  default_settings()
+  if not  (opt.destination?)
     console.log 'You are missing either destination or timeline start/end dates.'
+  else if not (opt.start_date? and opt.end_date?) and not opt.moments[0]?
+    console.log 'Cannot determine start and end with no moments'
   else
+    if not opt.start_date?
+      SETTINGS.start_date = 
+        new Date (Math.min (parse_date(m.start) for m in opt.moments)...) - 3*1000*60*60*24
+    else SETTINGS.start_date = opt.start_date
+    if not opt.end_date?
+      SETTINGS.end_date = 
+        new Date (Math.max (parse_date(m.end) for m in opt.moments)...) + 3*1000*60*60*24
+    else SETTINGS.end_date = opt.end_date
+    
     create_interval_markers (SETTINGS.spine = create_spine opt.destination)
-  if opt.moments.length != 0
-    SETTINGS.structure = opt.structure
-    opt.moments.map (m) ->  # Convert all dates to js format
-      [m.start, m.end] = [parse_date(m.start), parse_date(m.end)]
-    SETTINGS.moments = opt.moments.sort (a,b) -> a.start - b.start
-    create_moments SETTINGS.spine
+    SETTINGS.spine.data('settings',SETTINGS)
+
+    if opt.moments[0]?
+      if not opt.structure then console.log 'Structure required for building moments'
+      else
+        SETTINGS.structure = opt.structure
+        opt.moments.map (m) ->  # Convert all dates to js format
+          [m.start, m.end] = [parse_date(m.start), parse_date(m.end)]
+        SETTINGS.moments = opt.moments.sort (a,b) -> a.start - b.start
+        create_moments SETTINGS.spine
 
 create_spine = (destination) ->
 
@@ -79,18 +96,20 @@ create_spine = (destination) ->
     .data('clicked',true)
     .click ->
       clicked = circle.data('clicked')
-      m.is_expanded = clicked for m in SETTINGS.moments
+      m.is_expanded = clicked for m in $(this).parent().data('settings').moments
       circle.data('clicked',!clicked)
-      layer_moment_tooltips()
+      layer_moment_tooltips($(this).parent())
     return circle
 
   spine_left = SETTINGS.spine_buffer
-  SETTINGS.container = $('<div/ class="timeline_container">')
+  id = "timeline#{$('.timeline_container').length}"
+  SETTINGS.container = $("<div/ id='#{id}' class='timeline_container'>")
     .appendTo destination
   $('<div/ class="spine">').appendTo(SETTINGS.container)
     .css({left : spine_left + '%', width : 0})
     .animate({ width : 97 - spine_left + '%' }, {duration : 400})
     .append draw_origin_circle().addClass('origin').delay(400).fadeIn(300)
+    .data 'settings', SETTINGS
     
 
 create_interval_markers = (spine) ->
@@ -202,33 +221,34 @@ create_moments = (spine) ->
     create_info_box = (m) ->
       # Create the info box to contain them, and append it to the spine
       m.info_box = $('<div/ class="info_box">').appendTo(SETTINGS.spine)
+      m.spine = SETTINGS.spine
       # Create shorthand for a temporary use
       [e,c,i] = [m.expanded.elem, m.collapsed.elem, m.info_box]
       # Save the css values of height and width for the different views
       [m.collapsed.css, m.expanded.css] = [css_values(c, i), css_values(e, i)]
       c.show() 
       hover_on = ->
-        m.end_marker.fadeIn(200)
-        m.duration_wire.animate {width : m.duration_wire.data('w')}, {duration : 200}
+        m.end_marker.fadeIn(300)
+        m.duration_wire.animate {width : m.duration_wire.data('w')}, {duration : 300}
       hover_off = ->
-        m.end_marker.fadeOut(200)
-        m.duration_wire.animate {width : 0}, {duration : 200}
+        m.end_marker.fadeOut(300)
+        m.duration_wire.animate {width : 0}, {duration : 300}
       i.css
         width : i.width(), height : i.height(), marginLeft : -i.width()/2
         left : SETTINGS.date_to_marker_left_pct(m.start) + '%'
-      .click ->
+      .click (e) ->
         m.is_expanded = !m.is_expanded
-        layer_moment_tooltips() 
+        layer_moment_tooltips(m.spine) 
       .hover hover_on, hover_off
 
-    add_moment_functionality = (m) ->
+    add_moment_functionality = (m,spine) ->
       m.bottom = -> @goal_top + @get_projected_css().ih_px
 
       m.get_projected_css = ->
-        i = c = m.collapsed
-        i = m.expanded if m.is_expanded
+        i = c = @collapsed
+        i = @expanded if @is_expanded
         [iw,ih,iml] = [i.css.w, i.css.h, -c.css.w/2]
-        spine_width = parseFloat SETTINGS.spine.width()
+        spine_width = parseFloat spine.width()
         ml_pct = 100*iml/spine_width  # Get left pct of leftmost edge, should be neg
         leftmost = ml_pct + (left = SETTINGS.date_to_marker_left_pct(m.start))
         rightmost = leftmost + (width_pct = (100*iw/spine_width))
@@ -254,7 +274,7 @@ create_moments = (spine) ->
         m.goal_top = top
 
       m.clash_with = (m) ->
-        vertical = (us, them) -> !((us.t > them.b) or (them.t > us.b))
+        vertical = (us, them) -> !((us.t > them.b-3) or (them.t+3 > us.b))
         horizontal = (us, them) -> !((us.irm < them.ilm) or (them.irm < us.ilm))
         [us, them] = [@get_projected_css(), m.get_projected_css()]
         [us.t, us.b, them.t, them.b] = [@goal_top, @bottom(), m.goal_top, m.bottom()]
@@ -264,7 +284,7 @@ create_moments = (spine) ->
     # Create the title/content elements
     produce_collapsed_elem m, produce_expanded_elem
     create_info_box m
-    add_moment_functionality m
+    add_moment_functionality m, SETTINGS.spine
 
   produce_start_wire = (m) ->
     h = Math.abs((m.goal_top + m.bottom())/2)
@@ -272,7 +292,7 @@ create_moments = (spine) ->
     m.start_wire = produce_wire(m,m.start)
       .addClass('vertical start')
       .delay(800)
-      .animate {height : h, top : t}, {duration : 200}
+      .animate {height : h, top : t}, {duration : 300}
 
   produce_duration_wire = (m) ->
     w = SETTINGS.date_to_marker_left_pct(m.end) -
@@ -288,21 +308,24 @@ create_moments = (spine) ->
     produce_start_wire m
     produce_duration_wire m
   last_index = (infos = $('.info_box')).length - 1
-  infos.hide().delay(400).fadeIn 200, ->  # Fade in infos...
-    layer_moment_tooltips() if infos.index($(this)) == last_index
+  infos.hide().delay(400).fadeIn 300, ->  # Fade in infos...
+    layer_moment_tooltips(SETTINGS.spine) if infos.index($(this)) == last_index
   # On the completion of the fade, apply layering
 
-layer_moment_tooltips = ->
+layer_moment_tooltips = (spine) ->
+
+  SETTINGS = spine.data('settings')
 
   place = (m,fixed,m_css) ->
 
-    adjust_height = (m, m_css, cm) ->
+    adjust_height = (m, cm) ->
+      m_css = m.get_projected_css()
       if m.is_up then m.goal_top = cm.goal_top - m_css.ih_px - 10
       else m.goal_top = cm.bottom() + 10
 
     clashed = (cm for cm in fixed when cm.clash_with m)
     if clashed.length != 0
-      adjust_height m, m_css, clashed[0]
+      adjust_height m, clashed[0]
       place m, fixed
     else m.fixed = true
   
@@ -311,7 +334,7 @@ layer_moment_tooltips = ->
       fixed = (fm for fm in moments when fm.fixed and m.id != fm.id)
       place m, fixed, m.get_projected_css()
 
-  ms = SETTINGS.moments[..]
+  ms = spine.data('settings').moments[..]
   [ups, downs] = [[],[]]
   for m in ms
     [m.set_initial_top(), m.fixed = false]
@@ -320,7 +343,7 @@ layer_moment_tooltips = ->
     if a.is_expanded == b.is_expanded then a.start - b.start
     else if a.is_expanded then 1 else -1
   [ups.sort(comp), downs.sort(comp)].map place_moments
-  animate_moments()
+  animate_moments(SETTINGS.moments, SETTINGS.spine, SETTINGS.spine.parent())
 
 draw_end_wires = (m,vh) ->
   if m.is_expanded and not m.horizontal_end_wire?
@@ -332,14 +355,13 @@ draw_end_wires = (m,vh) ->
     animate_vertical = ->
       m.vertical_end_wire.animate {
         height : Math.abs(vh), top : vt
-      }, {duration : 200}
+      }, {duration : 300}
     m.horizontal_end_wire = produce_wire(m,m.start)
-      .delay(200)
+      .delay(300)
       .addClass('horizontal end').css('top',vh)
-      .animate {width : w}, {duration : 200, complete : -> animate_vertical()}
+      .animate {width : w}, {duration : 300, complete : -> animate_vertical()}
 
-animate_moments = ->
-  ms = SETTINGS.moments
+animate_moments = (ms, spine, container) ->
   for m in ms
     [e,c,i,css] = [m.expanded.elem, m.collapsed.elem, m.info_box, null]
     if !(m.is_expanded ?= false)  
@@ -347,25 +369,26 @@ animate_moments = ->
     else [c.hide(), e.show(), css = m.expanded.css]
     i.animate {
       top : m.goal_top, width : css.w, height : css.h
-    }, {duration : 200}
+    }, {duration : 300}
     h = (m.goal_top + m.bottom())/2
     [vt,vh] = (if m.is_up then [h,Math.abs(h)] else [2,Math.abs(h)])
-    m.start_wire.animate {height : vh, top : vt}, {duration : 200}
+    m.start_wire.animate {height : vh, top : vt}, {duration : 300}
     if m.horizontal_end_wire? and m.is_expanded  # Then lines already present
-      m.horizontal_end_wire.animate {top : h}, {duration : 200}
-      m.vertical_end_wire.animate {top : vt, height : vh}, {duration : 200}
+      m.horizontal_end_wire.animate {top : h}, {duration : 300}
+      m.vertical_end_wire.animate {top : vt, height : vh}, {duration : 300}
     else if m.is_expanded then draw_end_wires(m,h) 
     else if m.horizontal_end_wire? then m.remove_end_wires()
   [t, b] = [Math.min(((m.goal_top) for m in ms)...), Math.max (m.bottom() for m in ms)... ]
-  b += 10
-  height = SETTINGS.container.height()
-  bottom_room = height - parseFloat SETTINGS.spine.css('top')
+  if b < 0 then b = 0
+  b += 25
+  height = container.height()
+  bottom_room = height - parseFloat spine.css('top')
   if (1.1*(b-t) > height)
     height = 1.1*(b-t)
-    SETTINGS.container.animate {height : height}, {duration : 200}
+    container.animate {height : height}, {duration : 300}
   else
-    SETTINGS.container.animate {height : 1.1*(b-t)}, {duration : 200}
-  SETTINGS.spine.animate {top : 100*Math.abs(t)/(b-t) + '%'}, {duration : 200}
+    container.animate {height : 1.1*(b-t)}, {duration : 300}
+  spine.animate {top : 100*Math.abs(t)/(Math.abs(b)-t) + '%'}, {duration : 300}
 
 parse_date = (input) ->
   if input.getDate? then return new Date(input.getTime())

@@ -523,10 +523,9 @@ populate_exercises_page = (vars) ->
         keys : ['handin', 'spec', 'given_element']
     }
 
-    if module.id == '113' 
-      create_timeline
-        start_date : vars.start, end_date : vars.end, destination : destination_div
-        structure : structure, moments : module.exercises
+    create_timeline
+      destination : destination_div
+      structure : structure, moments : module.exercises
 
   $('#back_term_btn').bind 'click', ->
       if PERIOD != 1 then load_exercises_page null, null, -1
@@ -557,7 +556,7 @@ populate_givens = (givens_data, header) ->
   givens_table = $('#givens-table')
   givens_table.html('')
   for category in givens_data
-    head = $('<thead/>').append $("<tr><th><h4>#{category.type}</h4></th></tr>")
+    head = $('<thead/>').append $("<tr><th colspan='2'><h4>#{category.type}</h4></th></tr>")
     head.append $('<tr><th class="id">ID</th><th>Link</th></tr>')
     tbody = $('<tbody/>')
     for given, i in category.givens
