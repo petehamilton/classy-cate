@@ -231,11 +231,6 @@ extract_exercise_page_data = (html) ->
           end : end, moduleName : module.name
           name : $(ex_cell).text()[(id.length + type.length + 2)..].replace(/^\s+|\s+$/g,'')
           mailto : mailto, spec : spec, givens : givens, handin : handin
-          toString : ->
-            '  id:"'+@id+'", type:"'+@type+'", name:"'+@name+'", handin:"'+@handin + '"' +
-            '\n  start: new Date('+@start.getTime()+'), end: new Date('+end.getTime()+')'+
-            '\n  spec:"'+spec+'", givens:"'+givens+
-            '"\n,'
         }
 
         module.exercises.push(exercise_data)
@@ -314,6 +309,28 @@ extract_notes_page_data = (html) ->
 # Givens Page for Exercise
 # html - A jQuery object representing the page body
 extract_givens_page_data = (html) ->
+
+  categories = []
+
+  # Select the tables
+  html.find('table [cellpadding="3"]')[2..].each(->
+    category = {}
+    if $(this).find('tr').length > 1  # Only process tables with content
+      category.type = $(this).closest('form').find('h3 font').html()[..-2]
+      rows = $(this).find('tr')[1..]
+      category.givens = []
+      for row in rows
+        if (cell = $(row).find('td:eq(0) a')).attr('href')?
+          category.givens.push {
+            title : cell.html()
+            link  : cell.attr('href')
+          }
+      categories.push category
+    )    
+
+  # Return an array of categories, each element containing a type and rows
+  # categories = [ { type = 'TYPE', givens = [{title, link}] } ]
+  return categories
 
 
 
@@ -450,11 +467,23 @@ populate_exercises_page = (vars) ->
 
     if ex.spec?
       (specCell = row.find('.spec')).text('')
-      $(document.createElement('a')).attr('href',ex.spec).html('Spec Link').appendTo(specCell)
+      ex.spec_element = $(document.createElement('a')).attr('href',ex.spec).html('Spec Link').appendTo(specCell)
 
     if ex.givens?
       givensCell = row.find('.given').text('')
-      $(document.createElement('a')).attr('href',ex.givens).html('Givens').appendTo(givensCell)
+      ex.given_element = $(document.createElement('a')).attr('href',ex.givens)
+        .html('Givens').appendTo(givensCell)
+        .data('ex_title', row.find('.name').text())
+        .bind 'click', (e) ->
+          e.preventDefault()
+          url = $(this).attr 'href'
+          $('#active_given').removeAttr 'id'
+          $(this).attr 'id', 'active_given'
+          load_cate_page url, (body) ->
+            givens_data = extract_givens_page_data(body)
+            populate_givens(givens_data, $('#active_given').data('ex_title'))
+            $('#givens-modal').modal('show')
+
 
   destination_div = $('#page-content')
   modules = vars.modules
@@ -471,7 +500,7 @@ populate_exercises_page = (vars) ->
       note_link.bind 'click', (e) ->
           e.preventDefault()
           url = $(this).attr 'href'
-          $('#active_note').attr 'id', ''
+          $('#active_note').removeAttr 'id'
           $(this).attr 'id', 'active_note'
           load_cate_page url, (body) ->
             notes_data = extract_notes_page_data(body)
@@ -491,12 +520,10 @@ populate_exercises_page = (vars) ->
       extendedTitle : ['name']
       content :
         names : ['HAND IN', 'SPEC', 'GIVENS']
-        keys : ['handin', 'spec', 'givens']
+        keys : ['handin', 'spec', 'given_element']
     }
 
     if module.id == '113' 
-      console.log 'here we go'
-      console.log vars.start + ' ' + vars.end + ' ' + module.exercises.length
       create_timeline
         start_date : vars.start, end_date : vars.end, destination : destination_div
         structure : structure, moments : module.exercises
@@ -510,7 +537,6 @@ populate_exercises_page = (vars) ->
 populate_notes = (notes_data, header) ->
   notes_header = $('#notes-modal-header')
   notes_header.find('h3').remove()
-  console.log header
   notes_header.append("<h3>#{header}</h3>")
   notes_body = $("#notes-modal-tbody")
   notes_body.html('')
@@ -523,6 +549,24 @@ populate_notes = (notes_data, header) ->
       row.append("<td><a href='#{note.link}'>#{note.title}</a></td>")
     notes_body.append(row)
 
+populate_givens = (givens_data, header) ->
+  # givens_data = [ { type = 'TYPE', givens = [{title, link}] } ]
+  givens_header = $('#givens-modal-header')
+  givens_header.find('h3').remove()
+  givens_header.append("<h3>#{header}</h3>")
+  givens_table = $('#givens-table')
+  givens_table.html('')
+  for category in givens_data
+    head = $('<thead/>').append $("<tr><th><h4>#{category.type}</h4></th></tr>")
+    head.append $('<tr><th class="id">ID</th><th>Link</th></tr>')
+    tbody = $('<tbody/>')
+    for given, i in category.givens
+      row = $('<tr/>')
+      row.append("<td>#{i+1}</td>")
+      row.append("<td><a href='#{given.link}'>#{given.title}</a></td>")
+      tbody.append row
+    givens_table.append(head)
+    givens_table.append(tbody)
 
 populate_grades_page = (vars) ->
 

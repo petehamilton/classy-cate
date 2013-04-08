@@ -50,9 +50,8 @@ SETTINGS = {  # All lefts are percentages
 window.create_timeline = (opt) ->
   if not $? 
     jQuery_link = 'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'
-    jQuery_link = './jQuery.min.js' # Testing only
+    #jQuery_link = './jQuery.min.js' # Testing only
     script = document.createElement('script')
-    console.log jQuery_link
     script.setAttribute('src',jQuery_link)
     document.body.appendChild(script)
     console.log 'Adding jQuery'
@@ -167,16 +166,30 @@ create_moments = (spine) ->
       text = ''
       names = SETTINGS.structure.content.names
       keys = SETTINGS.structure.content.keys
-      links = []
       for key,i in keys
         if m[key]?
+          href = m[key]
+          if typeof m[key] != 'string'
+            href = 'javascript:void(0)'
           link = $('<a/ class="content_link">')
-            .attr({'href':'javascript:void(0)', 'target':m[key]})
+            .attr({'href':href, key:key})
             .text(names[i])
             .appendTo(expanded)
           expanded.html(expanded.html() + ' / ')
       expanded.html(expanded.html()[0..-4]) if expanded.html()[-3..] == ' / '
-      expanded.find('a').each( -> $(this).click( -> console.log "clicked link"))
+      expanded.find('a').each ->
+        $(this).data('value', m[$(this).attr('key')])
+        switch typeof $(this).data('value')
+          when 'string'
+            $(this).bind 'click', (e) -> e.stopPropagation()
+          when 'object'
+            $(this).bind 'click', (e) ->
+              e.preventDefault()
+              e.stopPropagation()
+              $(this).data('value').trigger('click')
+
+        
+      
       m.expanded = {}
       m.expanded.elem = expanded
 
@@ -206,7 +219,6 @@ create_moments = (spine) ->
       .click ->
         m.is_expanded = !m.is_expanded
         layer_moment_tooltips() 
-        console.log 'Clicked'
       .hover hover_on, hover_off
 
     add_moment_functionality = (m) ->

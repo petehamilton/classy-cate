@@ -22,6 +22,19 @@
           %td
           %td
 
+#givens-modal.modal.hide.fade
+  .modal-header#givens-modal-header
+    %button{:type => "button", :class => "close", :"data-dismiss" => "modal", :"aria-hidden" => "true"} &times;
+  .modal-body#givens-modal-body
+    %table.table.wide_table.table-striped.table-bordered#givens-table
+      %thead
+        %tr
+          %th.type TYPE
+      %tbody
+        %tr
+          %td
+          %td
+
 %table#exercises_template.table.wide_table.module_table.table-striped.table-bordered.hidden
   %tr
     %th ID
