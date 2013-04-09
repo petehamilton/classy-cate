@@ -466,9 +466,9 @@ populate_main_page = (vars) ->
   $('#term-selector .btn').each ->
     $(this).addClass('active') if $(this).attr('value') == period.toString()
 
-  lower = new Date(1360540800000)  #new Date()  # CURRENTLY TESTING
+  lower = new Date()  #new Date()  # CURRENTLY TESTING
   upper = new Date(lower.getTime() + 1000*60*60*24*6)
-  load_cate_page "/timetable.cgi?period=3&amp;class=c1&amp;keyt=2012:none:none:lmj112", (body) -> #$('#nav-exercises').attr('href'), (body) ->
+  load_cate_page $('#nav-exercises').attr('href'), (body) ->
     vars = extract_exercise_page_data body
     [exs_due, exs_late] = [[],[]]
     for m in vars.modules
@@ -504,6 +504,7 @@ populate_main_page = (vars) ->
           (-> $(this).data('bubble').trigger('mouseleave'))
         e.row.click -> $(this).data('bubble').trigger('click')
         e.row.css 'cursor', 'pointer'
+    else populate_exercises_page null, true
 
 
 populate_exercises_page = (vars, forDashboard) ->
@@ -565,11 +566,12 @@ populate_exercises_page = (vars, forDashboard) ->
 
   destination_div = $('#page-content')
   destination_div = $('#exercise-timeline') if forDashboard?
-  modules = vars.modules
+  (modules = vars.modules) if vars?
   if not forDashboard?
     $('#term_title').text('Timetable - ' + vars.term_title)
 
-  for module in (m for m in modules when m.exercises[0]?) # Ignore empty module  
+
+  if vars? then for module in (m for m in modules when m.exercises[0]?) # Ignore empty module  
     if not forDashboard?
       module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>') 
 
@@ -626,16 +628,17 @@ populate_exercises_page = (vars, forDashboard) ->
 
     module_header.append timeline_icon
 
-  if Math.max((m.exercises.length for m in vars.modules)...) <= 0
+  if not modules? or Math.max((m.exercises.length for m in vars.modules)...) <= 0
     no_modules = $('<div/>').css
       textAlign : 'center', paddingTop : '50px', paddingBottom : '50px'
     .append $('<div/ class="well">').append("<h4>There's no handins here!</h4>")
     $('#page-content').append no_modules
 
-  $('#back_term_btn').bind 'click', ->
-      if PERIOD != 1 then load_exercises_page null, null, -1
-  $('#next_term_btn').bind 'click', ->
-      if PERIOD != 6 then load_exercises_page null, null, 1
+  if not forDashboard?
+    $('#back_term_btn').bind 'click', ->
+        if PERIOD != 1 then load_exercises_page null, null, -1
+    $('#next_term_btn').bind 'click', ->
+        if PERIOD != 6 then load_exercises_page null, null, 1
 
 
 populate_notes = (notes_data, header) ->
