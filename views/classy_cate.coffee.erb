@@ -464,7 +464,7 @@ populate_main_page = (vars) ->
   $('#term-selector .btn').each ->
     $(this).addClass('active') if $(this).attr('value') == period.toString()
 
-  lower = new Date(1360540800000)  #new Date()
+  lower = new Date(1360540800000)  #new Date()  # CURRENTLY TESTING
   upper = new Date(lower.getTime() + 1000*60*60*24*6)
   load_cate_page "/timetable.cgi?period=3&amp;class=c1&amp;keyt=2012:none:none:lmj112", (body) -> #$('#nav-exercises').attr('href'), (body) ->
     vars = extract_exercise_page_data body
@@ -483,9 +483,19 @@ populate_main_page = (vars) ->
       create_timeline
         structure : TIMELINE_STRUCTURE, moments : exs
         destination : $('#exercise_timeline')
-      $('#exercises_table th').click -> 
+      $('#exercises_table th').css('cursor','pointer').click -> 
         $('#exercise_timeline .circle.origin').trigger 'click'
       for e in exs
+        day = 1000*60*60*24
+        [tomorrow, c] = [new Date(lower.getTime() + day), '']
+        if (e.end < tomorrow) 
+          c = 'label-important'
+        else if (e.end < (new Date(tomorrow.getTime() + 2*day)))
+          c = 'label-warning'
+        due_cell = e.row.find('.due')
+        label = $("<span class='label'>#{due_cell.text()}</span>")
+        label.addClass(c + ' due_label')
+        due_cell.html('').append label
         e.row.data 'bubble', e.info_box
         e.row.hover \
           (-> $(this).data('bubble').trigger('mouseenter')), \
@@ -527,6 +537,7 @@ populate_exercises_page = (vars, forDashboard) ->
     if forDashboard?
       [day, month, date] = ex.end.toString().split(' ')
       due_text = day + ' ' + date
+
     row.find('td.due').text due_text
     row.find('td.due').text
 
