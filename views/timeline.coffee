@@ -309,8 +309,7 @@ create_moments = (spine) ->
     produce_start_wire m
     produce_duration_wire m
   last_index = (infos = $('.info_box')).length - 1
-  infos.hide().delay(400).fadeIn 300, ->  # Fade in infos...
-    layer_moment_tooltips(SETTINGS.spine) if infos.index($(this)) == last_index
+  infos.hide().delay(400).fadeIn 300  # Fade in infos...
   # On the completion of the fade, apply layering
 
 layer_moment_tooltips = (spine) ->
