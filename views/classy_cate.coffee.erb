@@ -466,9 +466,10 @@ populate_main_page = (vars) ->
   $('#term-selector .btn').each ->
     $(this).addClass('active') if $(this).attr('value') == period.toString()
 
-  lower = new Date()  #new Date()  # CURRENTLY TESTING
+  lower = new Date(2013,0,29)  #new Date()  # CURRENTLY TESTING
+  console.log lower
   upper = new Date(lower.getTime() + 1000*60*60*24*6)
-  load_cate_page $('#nav-exercises').attr('href'), (body) ->
+  load_cate_page "timetable.cgi?keyt=2012:3:c1:lmj112", (body) ->#$('#nav-exercises').attr('href'), (body) ->
     vars = extract_exercise_page_data body
     [exs_due, exs_late] = [[],[]]
     for m in vars.modules
