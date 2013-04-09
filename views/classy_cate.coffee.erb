@@ -450,13 +450,12 @@ populate_main_page = (vars) ->
       .text($(this).text())
       .attr('value',$(this).find('a').attr('value'))
   $('#ex-go-btn').data('keyt',vars.keyt)
-  
+
   $('#ex-go-btn').bind 'click', ->
     p = $('#term-selector .active').attr 'value'
     c = $('#current-class').attr 'value'
     kt = $(this).data('keyt')
     url = "/timetable.cgi?period=#{p}&class=#{c}&keyt=#{kt}"
-    console.log url
     load_exercises_page(null, null, null, url)
 
   if (period = parseInt vars.default_period)%2 == 0 then period = period - 1

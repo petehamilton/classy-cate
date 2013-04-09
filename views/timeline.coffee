@@ -107,11 +107,10 @@ create_spine = (destination, SETTINGS) ->
   SETTINGS.container = $("<div/ id='#{id}' class='timeline_container'>")
     .appendTo destination
   SETTINGS.spine = $('<div/ class="spine">').appendTo(SETTINGS.container)
-    .css({left : spine_left + '%', width : 0})
-    .animate({ width : 97 - spine_left + '%' }, {duration : 400})
+    .css({left : spine_left + '%', width : 97 - spine_left + '%'})
     .append draw_origin_circle().addClass('origin').delay(400).fadeIn(300)
     .data 'settings', SETTINGS
-    
+
 
 create_interval_markers = (spine) ->
 
@@ -207,8 +206,6 @@ create_moments = (spine) ->
               e.preventDefault()
               e.stopPropagation()
               $(this).data('value').trigger('click')
-
-        
       
       m.expanded = {}
       m.expanded.elem = expanded
@@ -246,12 +243,12 @@ create_moments = (spine) ->
       m.bottom = -> @goal_top + @get_projected_css().ih_px
 
       m.get_projected_css = ->
-        i = c = @collapsed
+        i = (c = @collapsed)
         i = @expanded if @is_expanded
         [iw,ih,iml] = [i.css.w, i.css.h, -c.css.w/2]
-        spine_width = parseFloat spine.width()
+        spine_width = parseFloat @spine.width()
         ml_pct = 100*iml/spine_width  # Get left pct of leftmost edge, should be neg
-        leftmost = ml_pct + (left = SETTINGS.date_to_marker_left_pct(m.start))
+        leftmost = ml_pct + (left = @spine.data('settings').date_to_marker_left_pct(@start))
         rightmost = leftmost + (width_pct = (100*iw/spine_width))
         return {
           l : left, iml : iml, ih_px : ih
@@ -264,7 +261,7 @@ create_moments = (spine) ->
         [m.vertical_end_wire, m.horizontal_end_wire] = [null,null]
 
       m.set_initial_top = ->
-        css = m.get_projected_css()
+        css = @get_projected_css()
         left_index = Math.floor ((css.ilm - 
           SETTINGS.pct_buffer_for_markers) / SETTINGS.pct_per_interval()) - 1
         right_index = Math.floor ((css.irm - 
@@ -309,8 +306,8 @@ create_moments = (spine) ->
     produce_start_wire m
     produce_duration_wire m
   last_index = (infos = $('.info_box')).length - 1
-  infos.hide().delay(400).fadeIn 300  # Fade in infos...
   # On the completion of the fade, apply layering
+  layer_moment_tooltips(spine)
 
 layer_moment_tooltips = (spine) ->
 
@@ -331,7 +328,7 @@ layer_moment_tooltips = (spine) ->
   
   place_moments = (moments) ->
     for m in moments
-      fixed = (fm for fm in moments when fm.fixed and m.id != fm.id)
+      fixed = (fm for fm in moments when fm.fixed and m != fm)
       place m, fixed, m.get_projected_css()
 
   ms = spine.data('settings').moments[..]
