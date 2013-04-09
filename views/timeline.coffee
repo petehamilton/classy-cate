@@ -178,10 +178,14 @@ create_moments = (spine) ->
 
     produce_expanded_elem = (m) ->
       expanded = $('<div/ class="info_elem expanded">')
-      text = m.collapsed.elem.text() + ' - '
-      text += m[key] + ', ' for key in SETTINGS.structure.extendedTitle
+      text = m.collapsed.elem.text() 
+      if Math.max((m[key][..].replace(/\s/g, '').length \
+       for key in SETTINGS.structure.extendedTitle)...) != 0
+        text += ' - '
+        text += m[key] + ', ' for key in SETTINGS.structure.extendedTitle
+        text = text[0..-3]
       m.collapsed.elem.clone().addClass('expanded').css('display','block')
-        .text(text[0..-3]).appendTo expanded
+        .text(text).appendTo expanded
       text = ''
       names = SETTINGS.structure.content.names
       keys = SETTINGS.structure.content.keys
