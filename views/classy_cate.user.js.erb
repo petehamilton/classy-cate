@@ -1,13 +1,13 @@
-// ==UserScript== 
-// @name Classy CATE - Timeline TESTING 
-// @author Peter Hamilton 
-// @description CATE Hurts eyes. This makes it hurt them less. 
-// @version 1.2 
-// @match https://cate.doc.ic.ac.uk/* 
-// ==/UserScript== 
+// ==UserScript==
+// @name         Classy CATE
+// @author       Peter Hamilton
+// @description  CATE Hurts eyes. This makes it hurt them less.
+// @version <%= settings.userscript_version %>
+// @match https://cate.doc.ic.ac.uk/*
+// ==/UserScript==
 
 function main() {
-    window.classy_cate_script_version = "1.2";
+    window.classy_cate_script_version = "<%= settings.userscript_version %>";
     $('head').append('<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>');
     //$('head').append('<script type="text/javascript" src="https://classy-cate.herokuapp.com/classy-cate.js"></script>');
     $('head').append('<script type="text/javascript" src="https://classy-cate-timeline-dev.herokuapp.com/classy-cate.js"></script>');  //dev mode
