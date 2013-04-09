@@ -73,7 +73,7 @@ window.create_timeline = (opt) ->
         new Date (Math.max (parse_date(m.end) for m in opt.moments)...) + 3*1000*60*60*24
     else SETTINGS.end_date = opt.end_date
     
-    create_interval_markers (SETTINGS.spine = create_spine opt.destination)
+    create_interval_markers (SETTINGS.spine = create_spine opt.destination, SETTINGS)
     SETTINGS.spine.data('settings',SETTINGS)
 
     if opt.moments[0]?
@@ -86,7 +86,7 @@ window.create_timeline = (opt) ->
         create_moments SETTINGS.spine
   return SETTINGS.container
 
-create_spine = (destination) ->
+create_spine = (destination, SETTINGS) ->
 
   draw_origin_circle = ->
     circle = make_circle(15, 'black').css('left', 0).hide()
@@ -106,7 +106,7 @@ create_spine = (destination) ->
   id = "timeline#{$('.timeline_container').length}"
   SETTINGS.container = $("<div/ id='#{id}' class='timeline_container'>")
     .appendTo destination
-  $('<div/ class="spine">').appendTo(SETTINGS.container)
+  SETTINGS.spine = $('<div/ class="spine">').appendTo(SETTINGS.container)
     .css({left : spine_left + '%', width : 0})
     .animate({ width : 97 - spine_left + '%' }, {duration : 400})
     .append draw_origin_circle().addClass('origin').delay(400).fadeIn(300)

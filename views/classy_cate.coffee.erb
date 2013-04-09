@@ -449,11 +449,14 @@ populate_main_page = (vars) ->
     $('#current-class')
       .text($(this).text())
       .attr('value',$(this).find('a').attr('value'))
+  $('#ex-go-btn').data('keyt',vars.keyt)
+  
   $('#ex-go-btn').bind 'click', ->
     p = $('#term-selector .active').attr 'value'
     c = $('#current-class').attr 'value'
-    kt = vars.keyt
+    kt = $(this).data('keyt')
     url = "/timetable.cgi?period=#{p}&class=#{c}&keyt=#{kt}"
+    console.log url
     load_exercises_page(null, null, null, url)
 
   if (period = parseInt vars.default_period)%2 == 0 then period = period - 1
@@ -499,7 +502,7 @@ populate_main_page = (vars) ->
         e.row.data 'bubble', e.info_box
         e.row.hover \
           (-> $(this).data('bubble').trigger('mouseenter')), \
-          -> [$(this).data('bubble').trigger('mouseleave'), console.log 'Mouse']
+          (-> $(this).data('bubble').trigger('mouseleave'))
         e.row.click -> $(this).data('bubble').trigger('click')
         e.row.css 'cursor', 'pointer'
 
