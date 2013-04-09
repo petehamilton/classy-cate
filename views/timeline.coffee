@@ -84,6 +84,7 @@ window.create_timeline = (opt) ->
           [m.start, m.end] = [parse_date(m.start), parse_date(m.end)]
         SETTINGS.moments = opt.moments.sort (a,b) -> a.start - b.start
         create_moments SETTINGS.spine
+  return SETTINGS.container
 
 create_spine = (destination) ->
 

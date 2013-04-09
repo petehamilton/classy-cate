@@ -6,7 +6,15 @@ LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
 MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page).gsub("\n", "") %>'
 GRADES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :grades_page).gsub("\n", "") %>'
 EXERCISES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :exercises_page).gsub("\n", "") %>'
+
 PERIOD = null
+TIMELINE_STRUCTURE = {
+      title : ['id','type']
+      extendedTitle : ['name']
+      content :
+        names : ['HAND IN', 'SPEC', 'GIVENS']
+        keys : ['handin', 'spec', 'given_element']
+  }
 
 CLASSY_CATE_SCRIPT_VERSION = "<%= settings.userscript_version %>"
 
@@ -515,17 +523,32 @@ populate_exercises_page = (vars) ->
       populate_exercise_row row, exercise
     destination_div.append(module_header).append(module_table)
 
-    structure = {
-      title : ['id','type']
-      extendedTitle : ['name']
-      content :
-        names : ['HAND IN', 'SPEC', 'GIVENS']
-        keys : ['handin', 'spec', 'given_element']
-    }
 
-    create_timeline
-      destination : destination_div
-      structure : structure, moments : module.exercises
+    placeholder = $('<div/ class="timeline_slider">').appendTo destination_div
+    timeline = create_timeline
+              destination : placeholder
+              structure : TIMELINE_STRUCTURE, moments : module.exercises
+    .hide()
+
+    timeline_icon = $('<i/ rel="tooltip" title="Toggle timeline" class="icon-time timeline_toggle">')
+      .data 
+        'clicked' : false
+        'timeline' : timeline
+        'placeholder' : placeholder
+      .bind 'click', ->
+        $(this).data 'clicked', (clicked = !$(this).data 'clicked')
+        [timeline, placeholder] = [$(this).data('timeline'), $(this).data('placeholder')]
+        if clicked
+          placeholder.animate {minHeight : 150}, {duration : 400, complete : -> timeline.fadeIn()}
+        else
+          timeline.fadeOut
+            complete : -> placeholder.animate {minHeight : 0, height : 'auto'}, {duration : 400}
+      .tooltip {placement : 'left', delay : {show : 500, hide : 100}}
+
+    module_header.append timeline_icon
+
+
+    
 
   $('#back_term_btn').bind 'click', ->
       if PERIOD != 1 then load_exercises_page null, null, -1
