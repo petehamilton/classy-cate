@@ -740,6 +740,11 @@ populate_grades_page = (vars) ->
   $(vars.optional_modules).each (i, module) ->
     $('#cc-optional-modules').append(render_module module)
 
+
+#///////////////////////////////////////////////////////////////////////////////
+# Code to load pages
+#///////////////////////////////////////////////////////////////////////////////
+
 load_dashboard_page = (e) ->
   e.preventDefault() if e?
   window.location.hash = "dashboard"
