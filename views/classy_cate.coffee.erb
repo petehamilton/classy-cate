@@ -449,10 +449,12 @@ populate_main_page = (vars) ->
     $('#current-class')
       .text($(this).text())
       .attr('value',$(this).find('a').attr('value'))
+  $('#ex-go-btn').data('keyt',vars.keyt)
+
   $('#ex-go-btn').bind 'click', ->
     p = $('#term-selector .active').attr 'value'
     c = $('#current-class').attr 'value'
-    kt = vars.keyt
+    kt = $(this).data('keyt')
     url = "/timetable.cgi?period=#{p}&class=#{c}&keyt=#{kt}"
     load_exercises_page(null, null, null, url)
 
@@ -464,8 +466,47 @@ populate_main_page = (vars) ->
   $('#term-selector .btn').each ->
     $(this).addClass('active') if $(this).attr('value') == period.toString()
 
+  lower = new Date(1360540800000)  #new Date()  # CURRENTLY TESTING
+  upper = new Date(lower.getTime() + 1000*60*60*24*6)
+  load_cate_page "/timetable.cgi?period=3&amp;class=c1&amp;keyt=2012:none:none:lmj112", (body) -> #$('#nav-exercises').attr('href'), (body) ->
+    vars = extract_exercise_page_data body
+    [exs_due, exs_late] = [[],[]]
+    for m in vars.modules
+      for e in m.exercises
+        if lower <= e.end <= upper then exs_due.push e
+        else if e.end < lower and e.handin? then exs_late.push e
+    if exs_due.length != 0
+      [vars, fake_module] = [{},{}]
+      fake_module.exercises = exs_due
+      vars.modules = [fake_module]
+      exs = (populate_exercises_page vars, true).sort (a,b) ->
+        a.end - b.end
+      $('#exercises_table').append(e.row) for e in exs
+      create_timeline
+        structure : TIMELINE_STRUCTURE, moments : exs
+        destination : $('#exercise_timeline')
+      $('#exercises_table th').css('cursor','pointer').click -> 
+        $('#exercise_timeline .circle.origin').trigger 'click'
+      for e in exs
+        day = 1000*60*60*24
+        [tomorrow, c] = [new Date(lower.getTime() + day), '']
+        if (e.end < tomorrow) 
+          c = 'label-important'
+        else if (e.end < (new Date(tomorrow.getTime() + 2*day)))
+          c = 'label-warning'
+        due_cell = e.row.find('.due')
+        label = $("<span class='label'>#{due_cell.text()}</span>")
+        label.addClass(c + ' due_label')
+        due_cell.html('').append label
+        e.row.data 'bubble', e.info_box
+        e.row.hover \
+          (-> $(this).data('bubble').trigger('mouseenter')), \
+          (-> $(this).data('bubble').trigger('mouseleave'))
+        e.row.click -> $(this).data('bubble').trigger('click')
+        e.row.css 'cursor', 'pointer'
 
-populate_exercises_page = (vars) ->
+
+populate_exercises_page = (vars, forDashboard) ->
 
   format_date = (d) ->
     pad = (a,b) ->
@@ -474,6 +515,9 @@ populate_exercises_page = (vars) ->
 
   populate_exercise_row = (row, ex) ->
     id_cell = row.find('.id')
+    if forDashboard?
+      id_cell.text(ex.moduleName)
+      id_cell = row.find('.name') 
     if ex.handin?
         id_cell.html('')
         handin_anchor = $(document.createElement('a'))
@@ -481,12 +525,23 @@ populate_exercises_page = (vars) ->
         handin_anchor.addClass(
           if ex.due > (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
     else
-      id_cell.html('{'+ex.id+':'+ex.type+'}')
+      if not forDashboard? or !/\S/.test(ex.name)
+        id_cell.html('{'+ex.id+':'+ex.type+'}') 
+      else id_cell.html('')
     if /\S/.test(ex.name)
-      name_cell = row.find('td.name').text(ex.name)
+      name_cell = row.find('td.name')
+      if not forDashboard?
+        name_cell.text(ex.name)
+      else name_cell.html(name_cell.html() + ex.name)
       
     row.find('td.set').text(format_date ex.start)
-    row.find('td.due').text(format_date ex.end)
+    due_text = format_date ex.end
+    if forDashboard?
+      [day, month, date] = ex.end.toString().split(' ')
+      due_text = day + ' ' + date
+
+    row.find('td.due').text due_text
+    row.find('td.due').text
 
     if ex.spec?
       (specCell = row.find('.spec')).text('')
@@ -509,14 +564,16 @@ populate_exercises_page = (vars) ->
 
 
   destination_div = $('#page-content')
+  destination_div = $('#exercise-timeline') if forDashboard?
   modules = vars.modules
-  $('#term_title').text('Timetable - ' + vars.term_title)
-  
+  if not forDashboard?
+    $('#term_title').text('Timetable - ' + vars.term_title)
 
-  for module in (m for m in modules when m.exercises[0]?) # Ignore empty modules
-    module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>')
+  for module in (m for m in modules when m.exercises[0]?) # Ignore empty module  
+    if not forDashboard?
+      module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>') 
 
-    if module.notesLink?
+    if module.notesLink? and not forDashboard?
       note_link = $('<a/>').attr('href', module.notesLink).html('Notes')
         .data('module_title',module_header.text())  # Save title link for modal
 
@@ -531,13 +588,20 @@ populate_exercises_page = (vars) ->
             $("#notes-modal").modal('show')
       module_header.append(" - ").append(note_link)
 
-    module_table = $('#exercises_template').clone().removeClass('hidden')
+    module_table = $('#exercises_table')
+    if not forDashboard? 
+      module_table = $('#exercises_template').clone()
+    module_table.removeClass('hidden')
+
     for exercise in module.exercises
       row = $('#exercise_row_template').clone()
-      row.removeClass('hidden').appendTo(module_table)
+      if not forDashboard?
+        row.removeClass('hidden').appendTo(module_table)
+      else exercise.row = row.removeClass('hidden')  # rememeber to append
       populate_exercise_row row, exercise
-    destination_div.append(module_header).append(module_table)
+    destination_div.append(module_header).append(module_table) if not forDashboard?
 
+    if forDashboard? then return module.exercises
 
     placeholder = $('<div/ class="timeline_slider">').appendTo destination_div
     timeline = create_timeline
