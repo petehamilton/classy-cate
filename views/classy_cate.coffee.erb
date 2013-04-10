@@ -425,6 +425,7 @@ populate_layout = (vars) ->
 
   # New Bindings
   $('#nav-dashboard').bind 'click', load_dashboard_page
+  $('#nav-exercises').bind 'click', load_exercises_page
   $('#nav-grades').bind 'click', load_grades_page
   $('#old-cate-button').bind 'click', activate_nostalgia_mode
 
@@ -765,6 +766,10 @@ load_grades_page = (e) ->
 
 load_exercises_page = (e, fallback, shifting, url) ->
 
+  if e?
+    e.preventDefault()
+    url = e.target.getAttribute('href')
+
   get_period_from_href = (href) ->
     parseInt href.split('period=')[1][0]
 
@@ -778,7 +783,6 @@ load_exercises_page = (e, fallback, shifting, url) ->
     crrt = $('#nav-exercises').attr('href').split('period=')
     crrt[0] + 'period=' + p + crrt[1][1..]
 
-  e.preventDefault() if e?
   window.location.hash = "timetable"
 
   href = $('#nav-exercises').attr('href')
