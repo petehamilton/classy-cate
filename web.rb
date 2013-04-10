@@ -29,7 +29,7 @@ end
 
 get '/classy-cate.css' do
   get_cache('classy-cate-css', settings.asset_cache_for) {
-    less(:classy_cate) + less(:timeline)
+    less(:classy_cate)
   }
 end
 
