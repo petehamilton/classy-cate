@@ -23,25 +23,13 @@ end
 
 get '/classy-cate.js' do
   get_cache('classy-cate-js', settings.asset_cache_for) {
-    coffee(erb(:"classy_cate.coffee"))
+    coffee(erb(:"classy_cate.coffee")) + coffee(:"timeline")
   }
 end
 
 get '/classy-cate.css' do
   get_cache('classy-cate-css', settings.asset_cache_for) {
-    less :classy_cate
-  }
-end
-
-get '/timeline.js' do
-  get_cache('timeline-js', settings.asset_cache_for) {
-    coffee(:"timeline")
-  }
-end
-
-get '/timeline.css' do
-  get_cache('timeline-css', settings.asset_cache_for) {
-    less :timeline
+    less(:classy_cate)
   }
 end
 

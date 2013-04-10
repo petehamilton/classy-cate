@@ -9,9 +9,8 @@
 function main() {
     window.classy_cate_script_version = "<%= settings.userscript_version %>";
     $('head').append('<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>');
-    //$('head').append('<script type="text/javascript" src="https://classy-cate.herokuapp.com/classy-cate.js"></script>');
-    $('head').append('<script type="text/javascript" src="https://classy-cate-timeline-dev.herokuapp.com/classy-cate.js"></script>');  //dev mode
-    $('head').append('<script type="text/javascript" src="https://classy-cate-timeline-dev.herokuapp.com/timeline.js"></script>');  //dev mode
+    $('head').append('<script type="text/javascript" src="https://classy-cate-timeline-dev.herokuapp.com/classy-cate.js"></script>');
+    //$('head').append('<script type="text/javascript" src="https://localhost:4567/classy-cate.js"></script>');  //dev mode
 }
 
 // a function that loads jQuery and calls a callback function when jQuery has finished loading

@@ -740,6 +740,11 @@ populate_grades_page = (vars) ->
   $(vars.optional_modules).each (i, module) ->
     $('#cc-optional-modules').append(render_module module)
 
+
+#///////////////////////////////////////////////////////////////////////////////
+# Code to load pages
+#///////////////////////////////////////////////////////////////////////////////
+
 load_dashboard_page = (e) ->
   e.preventDefault() if e?
   window.location.hash = "dashboard"
@@ -806,7 +811,6 @@ load_css = ->
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
   $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
   $('head').append('<link rel="stylesheet" href="<%= settings.cc_css_url %>" type="text/css" />');
-  $('head').append('<link rel="stylesheet" href="<%= settings.tl_css_url %>" type="text/css" />')
 
 
 initial_load = ->
