@@ -15,7 +15,7 @@ get '/' do
 end
 
 # Asset Serving
-get '`' do
+get '/classy-cate.user.js' do
   get_cache('classy-cate-user-js', settings.asset_cache_for) {
     erb(:"classy_cate.user.js")
   }
@@ -23,13 +23,13 @@ end
 
 get '/classy-cate.js' do
   get_cache('classy-cate-js', settings.asset_cache_for) {
-    coffee(erb(:"classy_cate.coffee"))
+    coffee(erb(:"classy_cate.coffee")) + coffee(:"timeline")
   }
 end
 
 get '/classy-cate.css' do
   get_cache('classy-cate-css', settings.asset_cache_for) {
-    less :classy_cate
+    less(:classy_cate)
   }
 end
 
