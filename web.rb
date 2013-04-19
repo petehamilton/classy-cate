@@ -21,6 +21,10 @@ get '/classy-cate.user.js' do
   }
 end
 
+get '/classy-safari.safariextz' do
+  send_file "ClassySafari.safariextz"
+end
+
 get '/classy-cate.js' do
   get_cache('classy-cate-js', settings.asset_cache_for) {
     coffee(erb(:"classy_cate.coffee")) + coffee(:"timeline")
