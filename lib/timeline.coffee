@@ -405,6 +405,7 @@ make_circle = (r, c, shadow) ->
   s = '0 0 1px black'
   circle = $('<div/ class="circle">').css
       background : c, height : r, width : r
+      borderRadius : r
       '-moz-border-radius' : r, '-webkit-border-radius' : r
       marginTop : -r/2, marginLeft : -r/2
   if shadow then circle.css
