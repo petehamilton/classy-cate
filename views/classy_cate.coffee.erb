@@ -217,7 +217,8 @@ extract_exercise_page_data = (html) ->
     current_date = parse_date dates.start
     current_date.setDate(current_date.getDate() - dates.colBufferToFirst)
     for ex_cell in exercise_cells
-      colSpan = parseInt $(ex_cell).attr('colspan')
+      colSpan = parseInt($(ex_cell).attr('colspan') ? 1)
+      colSpan = 1 if colSpan == NaN
       if $(ex_cell).attr('bgcolor')? and $(ex_cell).find('a').length != 0
         [id, type] = $(ex_cell).find('b').eq(0).text().split(':')
         hrefs = ($(anchor).attr('href') for anchor in $(ex_cell).find('a') when $(anchor).attr('href')?)
