@@ -6,7 +6,15 @@ LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
 MAIN_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :main_page).gsub("\n", "") %>'
 GRADES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :grades_page).gsub("\n", "") %>'
 EXERCISES_PAGE_HTML = '<%= Rack::Utils.escape_html(haml :exercises_page).gsub("\n", "") %>'
+
 PERIOD = null
+TIMELINE_STRUCTURE = {
+      title : ['id','type']
+      extendedTitle : ['name']
+      content :
+        names : ['HAND IN', 'SPEC', 'GIVENS']
+        keys : ['handin', 'spec', 'given_element']
+  }
 
 CLASSY_CATE_SCRIPT_VERSION = "<%= settings.userscript_version %>"
 
@@ -139,14 +147,16 @@ extract_exercise_page_data = (html) ->
     body.find('h1').text()[-9..].split('-')
 
   extract_start_end_dates = (fullTable, years) ->
-
     # Converts a month into an int (indexed from 1)
     # e.g. "January" -> 1
     # month - Month name as a capitalised string
-    month_to_int = (month) ->
+    month_to_int = (m) ->
       months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
                 'August', 'September', 'October', 'November', 'December']
-      months.indexOf(month) + 1
+      return 6 if m == 'J'
+      rexp = new RegExp(m,'g')
+      for month,i in months
+            if rexp.test(month) then return i+1
 
     # Extracts months from table row
     # e.g. ["January", "February", "March"]
@@ -164,8 +174,8 @@ extract_exercise_page_data = (html) ->
     extract_days = (table_row) ->
       table_headers = ($(cell) for cell in table_row.find('th'))
       days_text = (c.text() for c in table_headers)
-      valid_days = (d for d in days_text when d.replace(/\s+/g, '') != '')
-      days_as_ints = valid_days.map parseInt
+      valid_days = (d for d in days_text when d.replace(/\s+/g, '') != '') 
+      days_as_ints = valid_days.map parseFloat # Parse int was going nuts, '23' -> 54???
       return days_as_ints
 
     # TODO: What if the timetable crosses year boundaries?
@@ -207,7 +217,8 @@ extract_exercise_page_data = (html) ->
     current_date = parse_date dates.start
     current_date.setDate(current_date.getDate() - dates.colBufferToFirst)
     for ex_cell in exercise_cells
-      colSpan = parseInt $(ex_cell).attr('colspan')
+      colSpan = parseInt($(ex_cell).attr('colspan') ? 1)
+      colSpan = 1 if colSpan == NaN
       if $(ex_cell).attr('bgcolor')? and $(ex_cell).find('a').length != 0
         [id, type] = $(ex_cell).find('b').eq(0).text().split(':')
         hrefs = ($(anchor).attr('href') for anchor in $(ex_cell).find('a') when $(anchor).attr('href')?)
@@ -227,9 +238,10 @@ extract_exercise_page_data = (html) ->
         exercise_data = {
           id : id, type : type, start : new Date(current_date.getTime())
           end : end, moduleName : module.name
-          name : $(ex_cell).text()[(id.length + type.length + 2)..]
+          name : $(ex_cell).text()[(id.length + type.length + 2)..].replace(/^\s+|\s+$/g,'')
           mailto : mailto, spec : spec, givens : givens, handin : handin
         }
+
         module.exercises.push(exercise_data)
       current_date.setDate (current_date.getDate() + colSpan)
 
@@ -265,7 +277,7 @@ extract_exercise_page_data = (html) ->
 
   term_title = extract_term_title html
   timetable = (tb for tb in html.find('table') when $(tb).attr('border') == "0")
-  dates = extract_start_end_dates timetable, extract_academic_years html
+  dates = extract_start_end_dates timetable, extract_academic_years html   # WRONG
   modules = extract_module_exercise_data timetable
   m.exercises.sort ((a,b) -> if a.start < b.start then -1 else 1) for m in modules
   return {
@@ -302,6 +314,34 @@ extract_notes_page_data = (html) ->
       }
 
   return { notes: notes }
+
+# Givens Page for Exercise
+# html - A jQuery object representing the page body
+extract_givens_page_data = (html) ->
+
+  categories = []
+
+  # Select the tables
+  html.find('table [cellpadding="3"]')[2..].each(->
+    category = {}
+    if $(this).find('tr').length > 1  # Only process tables with content
+      category.type = $(this).closest('form').find('h3 font').html()[..-2]
+      rows = $(this).find('tr')[1..]
+      category.givens = []
+      for row in rows
+        if (cell = $(row).find('td:eq(0) a')).attr('href')?
+          category.givens.push {
+            title : cell.html()
+            link  : cell.attr('href')
+          }
+      categories.push category
+    )    
+
+  # Return an array of categories, each element containing a type and rows
+  # categories = [ { type = 'TYPE', givens = [{title, link}] } ]
+  return categories
+
+
 
 # Grades/Student Record Page
 # html - A jQuery object representing the page body
@@ -386,6 +426,7 @@ populate_layout = (vars) ->
 
   # New Bindings
   $('#nav-dashboard').bind 'click', load_dashboard_page
+  $('#nav-exercises').bind 'click', load_exercises_page
   $('#nav-grades').bind 'click', load_grades_page
   $('#old-cate-button').bind 'click', activate_nostalgia_mode
 
@@ -406,11 +447,69 @@ populate_main_page = (vars) ->
   $('#cc-other-extensions').attr('href', vars.extensions_link)
   $('#cc-other-documentation').attr('href', vars.documentation_link)
 
-  $('#cc-keyt').val(vars.keyt)
-  $('#cc-class-select').val(vars.default_class)
-  $('#cc-period-select').val(vars.default_period)
+  $('#class-selector li').bind 'click', ->
+    $('#current-class')
+      .text($(this).text())
+      .attr('value',$(this).find('a').attr('value'))
+  $('#ex-go-btn').data('keyt',vars.keyt)
 
-populate_exercises_page = (vars) ->
+  $('#ex-go-btn').bind 'click', ->
+    p = $('#term-selector .active').attr 'value'
+    c = $('#current-class').attr 'value'
+    kt = $(this).data('keyt')
+    url = "/timetable.cgi?period=#{p}&class=#{c}&keyt=#{kt}"
+    load_exercises_page(null, null, null, url)
+
+  if (period = parseInt vars.default_period)%2 == 0 then period = period - 1
+  $('#current-class').attr 'value', vars.default_class
+  $('#class-selector a').each ->
+    if $(this).attr('value') == vars.default_class
+      $('#current-class').text($(this).text()) 
+  $('#term-selector .btn').each ->
+    $(this).addClass('active') if $(this).attr('value') == period.toString()
+
+  lower = new Date() 
+  upper = new Date(lower.getTime() + 1000*60*60*24*6)
+  load_cate_page "timetable.cgi?keyt=2012:3:c1:lmj112", (body) ->#$('#nav-exercises').attr('href'), (body) ->
+    vars = extract_exercise_page_data body
+    [exs_due, exs_late] = [[],[]]
+    for m in vars.modules
+      for e in m.exercises
+        if lower <= e.end <= upper then exs_due.push e
+        else if e.end < lower and e.handin? then exs_late.push e
+    if exs_due.length != 0
+      [vars, fake_module] = [{},{}]
+      fake_module.exercises = exs_due
+      vars.modules = [fake_module]
+      exs = (populate_exercises_page vars, true).sort (a,b) ->
+        a.end - b.end
+      $('#exercises_table').append(e.row) for e in exs
+      create_timeline
+        structure : TIMELINE_STRUCTURE, moments : exs
+        destination : $('#exercise_timeline')
+      $('#exercises_table th').css('cursor','pointer').click -> 
+        $('#exercise_timeline .circle.origin').trigger 'click'
+      for e in exs
+        day = 1000*60*60*24
+        [tomorrow, c] = [new Date(lower.getTime() + day), '']
+        if (e.end < tomorrow) 
+          c = 'label-important'
+        else if (e.end < (new Date(tomorrow.getTime() + 2*day)))
+          c = 'label-warning'
+        due_cell = e.row.find('.due')
+        label = $("<span class='label'>#{due_cell.text()}</span>")
+        label.addClass(c + ' due_label')
+        due_cell.html('').append label
+        e.row.data 'bubble', e.info_box
+        e.row.hover \
+          (-> $(this).data('bubble').trigger('mouseenter')), \
+          (-> $(this).data('bubble').trigger('mouseleave'))
+        e.row.click -> $(this).data('bubble').trigger('click')
+        e.row.css 'cursor', 'pointer'
+    else populate_exercises_page null, true
+
+
+populate_exercises_page = (vars, forDashboard) ->
 
   format_date = (d) ->
     pad = (a,b) ->
@@ -419,6 +518,9 @@ populate_exercises_page = (vars) ->
 
   populate_exercise_row = (row, ex) ->
     id_cell = row.find('.id')
+    if forDashboard?
+      id_cell.text(ex.moduleName)
+      id_cell = row.find('.name') 
     if ex.handin?
         id_cell.html('')
         handin_anchor = $(document.createElement('a'))
@@ -426,57 +528,125 @@ populate_exercises_page = (vars) ->
         handin_anchor.addClass(
           if ex.due > (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
     else
-      id_cell.html('{'+ex.id+':'+ex.type+'}')
+      if not forDashboard? or !/\S/.test(ex.name)
+        id_cell.html('{'+ex.id+':'+ex.type+'}') 
+      else id_cell.html('')
     if /\S/.test(ex.name)
-      name_cell = row.find('td.name').text(ex.name)
-
-      if ex.handin?
-        name_cell.text(name_cell.text() + ' - ')
-        handin_anchor = $(document.createElement('a'))
-          .attr('href',ex.handin).html('Hand in').appendTo(name_cell)
-        handin_anchor.addClass(if ex.due > (new Date()) then 'handin_link' else 'late_handin')
+      name_cell = row.find('td.name')
+      if not forDashboard?
+        name_cell.text(ex.name)
+      else name_cell.html(name_cell.html() + ex.name)
+      
     row.find('td.set').text(format_date ex.start)
-    row.find('td.due').text(format_date ex.end)
+    due_text = format_date ex.end
+    if forDashboard?
+      [day, month, date] = ex.end.toString().split(' ')
+      due_text = day + ' ' + date
+
+    row.find('td.due').text due_text
+    row.find('td.due').text
 
     if ex.spec?
       (specCell = row.find('.spec')).text('')
-      $(document.createElement('a')).attr('href',ex.spec).html('Spec Link').appendTo(specCell)
+      ex.spec_element = $(document.createElement('a')).attr('href',ex.spec).html('Spec Link').appendTo(specCell)
 
     if ex.givens?
       givensCell = row.find('.given').text('')
-      $(document.createElement('a')).attr('href',ex.givens).html('Givens').appendTo(givensCell)
+      ex.given_element = $(document.createElement('a')).attr('href',ex.givens)
+        .html('Givens').appendTo(givensCell)
+        .data('ex_title', row.find('.name').text())
+        .bind 'click', (e) ->
+          e.preventDefault()
+          url = $(this).attr 'href'
+          $('#active_given').removeAttr 'id'
+          $(this).attr 'id', 'active_given'
+          load_cate_page url, (body) ->
+            givens_data = extract_givens_page_data(body)
+            populate_givens(givens_data, $('#active_given').data('ex_title'))
+            $('#givens-modal').modal('show')
+
 
   destination_div = $('#page-content')
-  modules = vars.modules
-  $('#term_title').text('Timetable - ' + vars.term_title)
+  destination_div = $('#exercise-timeline') if forDashboard?
+  (modules = vars.modules) if vars?
+  if not forDashboard?
+    $('#term_title').text('Timetable - ' + vars.term_title)
 
-  for module in (m for m in modules when m.exercises[0]?) # Ignore empty modules
-    module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>')
 
-    if module.notesLink?
-      note_link = $('<a/>').attr('href',module.notesLink).html('Notes')
+  if vars? then for module in (m for m in modules when m.exercises[0]?) # Ignore empty module  
+    if not forDashboard?
+      module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>') 
+
+    if module.notesLink? and not forDashboard?
+      note_link = $('<a/>').attr('href', module.notesLink).html('Notes')
+        .data('module_title',module_header.text())  # Save title link for modal
+
       note_link.bind 'click', (e) ->
           e.preventDefault()
           url = $(this).attr 'href'
+          $('#active_note').removeAttr 'id'
+          $(this).attr 'id', 'active_note'
           load_cate_page url, (body) ->
             notes_data = extract_notes_page_data(body)
-            populate_notes(notes_data)
+            populate_notes(notes_data, $('#active_note').data('module_title'))
             $("#notes-modal").modal('show')
-      module_header.text(module_header.text() + " - ").append(note_link)
+      module_header.append(" - ").append(note_link)
 
-    module_table = $('#exercises_template').clone().removeClass('hidden')
+    module_table = $('#exercises_table')
+    if not forDashboard? 
+      module_table = $('#exercises_template').clone()
+    module_table.removeClass('hidden')
+
     for exercise in module.exercises
       row = $('#exercise_row_template').clone()
-      row.removeClass('hidden').appendTo(module_table)
+      if not forDashboard?
+        row.removeClass('hidden').appendTo(module_table)
+      else exercise.row = row.removeClass('hidden')  # rememeber to append
       populate_exercise_row row, exercise
-    destination_div.append(module_header).append(module_table)
+    destination_div.append(module_header).append(module_table) if not forDashboard?
 
-  $('#back_term_btn').bind 'click', ->
-      if PERIOD != 1 then load_exercises_page null, null, -1
-  $('#next_term_btn').bind 'click', ->
-      if PERIOD != 6 then load_exercises_page null, null, 1
+    if forDashboard? then return module.exercises
 
-populate_notes = (notes_data) ->
+    placeholder = $('<div/ class="timeline_slider">').appendTo destination_div
+    timeline = create_timeline
+              destination : placeholder
+              structure : TIMELINE_STRUCTURE, moments : module.exercises
+    .hide()
+
+    timeline_icon = $('<i/ rel="tooltip" title="Toggle timeline" class="icon-time timeline_toggle">')
+      .data 
+        'clicked' : false
+        'timeline' : timeline
+        'placeholder' : placeholder
+      .bind 'click', ->
+        $(this).data 'clicked', (clicked = !$(this).data 'clicked')
+        [timeline, placeholder] = [$(this).data('timeline'), $(this).data('placeholder')]
+        if clicked
+          placeholder.animate {minHeight : 150}, {duration : 400, complete : -> timeline.fadeIn()}
+        else
+          timeline.fadeOut
+            complete : -> placeholder.animate {minHeight : 0, height : 'auto'}, {duration : 400}
+      .tooltip {placement : 'left', delay : {show : 500, hide : 100}}
+
+    module_header.append timeline_icon
+
+  if not modules? or Math.max((m.exercises.length for m in vars.modules)...) <= 0
+    no_modules = $('<div/>').css
+      textAlign : 'center', paddingTop : '50px', paddingBottom : '50px'
+    .append $('<div/ class="well">').append("<h4>There's no handins here!</h4>")
+    $('#page-content').append no_modules
+
+  if not forDashboard?
+    $('#back_term_btn').bind 'click', ->
+        if PERIOD != 1 then load_exercises_page null, null, -1
+    $('#next_term_btn').bind 'click', ->
+        if PERIOD != 6 then load_exercises_page null, null, 1
+
+
+populate_notes = (notes_data, header) ->
+  notes_header = $('#notes-modal-header')
+  notes_header.find('h3').remove()
+  notes_header.append("<h3>#{header}</h3>")
   notes_body = $("#notes-modal-tbody")
   notes_body.html('')
   for note, i in notes_data.notes
@@ -488,6 +658,24 @@ populate_notes = (notes_data) ->
       row.append("<td><a href='#{note.link}'>#{note.title}</a></td>")
     notes_body.append(row)
 
+populate_givens = (givens_data, header) ->
+  # givens_data = [ { type = 'TYPE', givens = [{title, link}] } ]
+  givens_header = $('#givens-modal-header')
+  givens_header.find('h3').remove()
+  givens_header.append("<h3>#{header}</h3>")
+  givens_table = $('#givens-table')
+  givens_table.html('')
+  for category in givens_data
+    head = $('<thead/>').append $("<tr><th colspan='2'><h4>#{category.type}</h4></th></tr>")
+    head.append $('<tr><th class="id">ID</th><th>Link</th></tr>')
+    tbody = $('<tbody/>')
+    for given, i in category.givens
+      row = $('<tr/>')
+      row.append("<td>#{i+1}</td>")
+      row.append("<td><a href='#{given.link}'>#{given.title}</a></td>")
+      tbody.append row
+    givens_table.append(head)
+    givens_table.append(tbody)
 
 populate_grades_page = (vars) ->
 
@@ -554,6 +742,11 @@ populate_grades_page = (vars) ->
   $(vars.optional_modules).each (i, module) ->
     $('#cc-optional-modules').append(render_module module)
 
+
+#///////////////////////////////////////////////////////////////////////////////
+# Code to load pages
+#///////////////////////////////////////////////////////////////////////////////
+
 load_dashboard_page = (e) ->
   e.preventDefault() if e?
   window.location.hash = "dashboard"
@@ -563,6 +756,7 @@ load_dashboard_page = (e) ->
     populate_html('#page-content', MAIN_PAGE_HTML)
     populate_main_page(main_page_vars)
 
+
 load_grades_page = (e) ->
   e.preventDefault() if e?
   window.location.hash = "grades"
@@ -571,7 +765,11 @@ load_grades_page = (e) ->
     populate_html('#page-content', GRADES_PAGE_HTML)
     populate_grades_page(grade_page_vars)
 
-load_exercises_page = (e, fallback, shifting) ->
+load_exercises_page = (e, fallback, shifting, url) ->
+
+  if e?
+    e.preventDefault()
+    url = e.target.getAttribute('href')
 
   get_period_from_href = (href) ->
     parseInt href.split('period=')[1][0]
@@ -586,7 +784,6 @@ load_exercises_page = (e, fallback, shifting) ->
     crrt = $('#nav-exercises').attr('href').split('period=')
     crrt[0] + 'period=' + p + crrt[1][1..]
 
-  e.preventDefault() if e?
   window.location.hash = "timetable"
 
   href = $('#nav-exercises').attr('href')
@@ -595,13 +792,15 @@ load_exercises_page = (e, fallback, shifting) ->
     href = get_url_for_period PERIOD
   else if fallback?
     href = alter_href_by href, (-1)
+  else if url?
+    href = url
 
   PERIOD = get_period_from_href href
 
   load_cate_page href, (body) ->
     exercise_page_vars = extract_exercise_page_data body
     go_forth_and_multiply = true
-    if isHoliday(get_period_from_href href) and (not shifting?)
+    if isHoliday(get_period_from_href href) and (not shifting? or url?)
       noOfExercises = 0
       for m in exercise_page_vars.modules
         noOfExercises += m.exs.length if m.exs?

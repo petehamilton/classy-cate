@@ -1,2 +1,7 @@
 *.crt
 *.key
+.DS_Store
+compile.sh
+copyTl.sh
+*.sh
+*.sym

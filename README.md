@@ -46,7 +46,7 @@ To develop and help improve classy-cate, do the following:
 
 Hopefully some first years will want to contribute to this project. If
 you're one of them, but are put off by what seems like a stupid amount
-of complexity just to get it working, then have a look at [this](https://github.com/lmj112/classy-cate/wiki/Getting-off-the-Ground-for-Development) page to get you started.
+of complexity just to get it working, then have a look at [this](https://github.com/LawrenceJones/classy-cate/wiki/Getting-off-the-Ground-for-Development) page to get you started.
 
 
 ## References
