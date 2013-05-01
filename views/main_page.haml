@@ -1,11 +1,11 @@
 = haml :grading_schema
 #identity-container.row
-  .span4
+  .span8
     %h1.section-header Identity
     %table.table.table-bordered.table-striped
       %tbody
         %tr
-          %td.profile-picture-container{:rowspan => "7"}
+          %td.profile-picture-container{:width => "120px", :rowspan => "7"}
             %img#cc-identity-profile-image.profile-image{:src => ""}/
           %td
             %b First Name
@@ -42,48 +42,6 @@
           %td
             %span#cc-identity-personal-tutor
   .span4
-    %h1.section-header Exercise Timetable
-    %form.form-horizontal{:action => "/timetable.cgi", :type => "GET"}
-      .control-group
-        %label.control-label{:for => "period-select"} Period
-        #period-select-container.controls
-          %select#cc-period-select{:name => "period"}
-            %option{:value => "1"} Autumn Term
-            %option{:value => "2"} Christmas
-            %option{:value => "3"} Spring Term
-            %option{:value => "4"} Easter
-            %option{:value => "5"} Summer Term
-            %option{:value => "6"} June-July
-            %option{:value => "7"} August-September
-      .control-group
-        %label.control-label{:for => "class-select"} Class
-        #class-select-container.controls
-          %select#cc-class-select{:name => "class"}
-            %option{:value => "c1"} COMP 1
-            %option{:value => "c2"} COMP 2
-            %option{:value => "c3"} COMP 3
-            %option{:value => "c4"} COMP 4
-            %option{:value => "j1"} JMC 1
-            %option{:value => "j2"} JMC 2
-            %option{:value => "j3"} JMC 3
-            %option{:value => "j4"} JMC 4
-            %option{:value => "i2"} ISE 2
-            %option{:value => "i3"} ISE 3
-            %option{:value => "i4"} ISE 4
-            %option{:value => "v5"} Computing
-            %option{:value => "s5"} Computing Spec.
-            %option{:value => "a5"} Advanced
-            %option{:value => "r5"} Research
-            %option{:value => "y5"} Industrial
-            %option{:value => "b5"} Bioinformatic
-            %option{:value => "occ"} Occasional
-            %option{:value => "r6"} PhD
-            %option{:value => "ext"} External
-      .control-group
-        #button-container.controls
-          %button.btn Go
-      %input#cc-keyt{:name => "keyt", :type => "hidden", :value => ""}/
-  .span4
     %h1.section-header Other Links
     %ul.nav.nav-tabs.nav-stacked
       %li.disabled
@@ -115,7 +73,7 @@
           .list-icon-container
             %i.icon-briefcase>
             \ 
-          .list-text Lecture Notes + Exercises Registration
+          .list-text Lecture Notes + Exs Registration
       %li
         %a#cc-other-projects-portal{:href => "#"}
           .list-icon-container
@@ -128,3 +86,95 @@
             %i.icon-magic>
             \ 
           .list-text Special Activities
+%hr
+#exercises-container.row
+  .span12
+    %h1.section-header 
+      Exercises
+      #exercise-nav
+        #term-selector.btn-group{"data-toggle" => 'buttons-radio'}
+          %button.btn{:value => "1"} Autumn
+          %button.btn{:value => "3"} Spring
+          %button.btn{:value => "5"} Summer
+          %button.btn{:value => "6"} June-July
+        %br
+        %button.btn#ex-go-btn Go!
+        %span#current-class.label 
+        #class-selector.btn-group 
+          %a.btn.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"} 
+            Select Class
+            %span.caret
+          %ul.dropdown-menu
+            %li
+              %a{:value => "c1"} COMP 1
+            %li
+              %a{:value => "c2"} COMP 2
+            %li
+              %a{:value => "c3"} COMP 3
+            %li
+              %a{:value => "c4"} COMP 4
+            %li
+              %a{:value => "j1"} JMC 1
+            %li
+              %a{:value => "j2"} JMC 2
+            %li
+              %a{:value => "j3"} JMC 3
+            %li
+              %a{:value => "j4"} JMC 4
+            %li
+              %a{:value => "i2"} ISE 2
+            %li
+              %a{:value => "i3"} ISE 3
+            %li
+              %a{:value => "i4"} ISE 4
+            %li
+              %a{:value => "v5"} Computing
+            %li
+              %a{:value => "s5"} Computing Spec.
+            %li
+              %a{:value => "a5"} Advanced
+            %li
+              %a{:value => "r5"} Research
+            %li
+              %a{:value => "y5"} Industrial
+            %li
+              %a{:value => "b5"} Bioinformatic
+            %li
+              %a{:value => "occ"} Occasional
+            %li
+              %a{:value => "r6"} PhD
+            %li
+              %a{:value => "ext"} External
+
+%h3 Due in next week...
+%table#exercises_table.table.table-hover.wide_table.module_table.table-striped.table-bordered.hidden
+  %tr
+    %th.module{:style => 'text-align : left'} Module
+    %th.id_name{:style => 'text-align : left'} ID - Name
+    %th.small Due On
+    %th.small Spec Link
+    %th.small Given link
+
+%table
+  %tr#exercise_row_template.hidden
+    %td.id{:style => 'text-align : left'} NA
+    %td.name{:style => 'text-align : left'} NA
+    %td.due NA
+    %td.spec NA
+    %td.given NA
+
+
+#exercise_timeline.timeline_slider
+
+#givens-modal.modal.hide.fade
+  .modal-header#givens-modal-header
+    %button{:type => "button", :class => "close", :"data-dismiss" => "modal", :"aria-hidden" => "true"} &times;
+  .modal-body#givens-modal-body
+    %table.table.wide_table.table-striped.table-bordered#givens-table
+      %thead
+        %tr
+          %th.type TYPE
+      %tbody
+        %tr
+          %td
+          %td

@@ -17,19 +17,21 @@ end
 # Asset Serving
 get '/classy-cate.user.js' do
   get_cache('classy-cate-user-js', settings.asset_cache_for) {
+    content_type "text/javascript"
     erb(:"classy_cate.user.js")
   }
 end
 
 get '/classy-cate.js' do
   get_cache('classy-cate-js', settings.asset_cache_for) {
-    coffee(erb(:"classy_cate.coffee"))
+    content_type "text/javascript"
+    coffee(erb(:"classy_cate.coffee")) + coffee(File.read(File.join('lib','timeline.coffee')))
   }
 end
 
 get '/classy-cate.css' do
   get_cache('classy-cate-css', settings.asset_cache_for) {
-    less :classy_cate
+    less(:classy_cate)
   }
 end
 
