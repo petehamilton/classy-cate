@@ -48,13 +48,13 @@ load_cate_page = (url, callback) ->
     url: url
     dataType: 'html'
     success: (data) ->
-      frame = $('<iframe class="hidden" src="about:blank"/>').hide()
-      frame.appendTo('body')
-      doc = frame.get(0).contentWindow.document
-      doc.write(data)
-      body = $('body', doc).clone()
-      frame.remove()
-      callback(body)
+      data = data.split(/<body.*>/)[1].split('</body>')[0]
+      body = $('<body/>').append(data)
+      # remove icons- cates really bad at providing them for
+      # an ajax, was hanging terribly in safari
+      icons = body.find('img[src^="icons/"]')
+      icons.remove()
+      callback body
 
 
 #///////////////////////////////////////////////////////////////////////////////
