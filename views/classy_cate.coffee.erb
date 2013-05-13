@@ -48,13 +48,13 @@ load_cate_page = (url, callback) ->
     url: url
     dataType: 'html'
     success: (data) ->
-      frame = $('<iframe class="hidden" src="about:blank"/>').hide()
-      frame.appendTo('body')
-      doc = frame.get(0).contentWindow.document
-      doc.write(data)
-      body = $('body', doc).clone()
-      frame.remove()
-      callback(body)
+      data = data.split(/<body.*>/)[1].split('</body>')[0]
+      body = $('<body/>').append(data)
+      # remove icons- cates really bad at providing them for
+      # an ajax, was hanging terribly in safari
+      icons = body.find('img[src^="icons/"]')
+      icons.remove()
+      callback body
 
 
 #///////////////////////////////////////////////////////////////////////////////
@@ -468,9 +468,9 @@ populate_main_page = (vars) ->
   $('#term-selector .btn').each ->
     $(this).addClass('active') if $(this).attr('value') == period.toString()
 
-  lower = new Date() 
-  upper = new Date(lower.getTime() + 1000*60*60*24*6)
-  load_cate_page "timetable.cgi?keyt=2012:3:c1:lmj112", (body) ->#$('#nav-exercises').attr('href'), (body) ->
+  lower = new Date()
+  upper = new Date(lower.getTime() + 1000*60*60*24*7 + 1)  # to include full day
+  load_cate_page $('#nav-exercises').attr('href'), (body) ->
     vars = extract_exercise_page_data body
     [exs_due, exs_late] = [[],[]]
     for m in vars.modules
@@ -526,7 +526,7 @@ populate_exercises_page = (vars, forDashboard) ->
         handin_anchor = $(document.createElement('a'))
           .attr('href',ex.handin).html('Hand in').appendTo(id_cell)
         handin_anchor.addClass(
-          if ex.due > (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
+          if ex.end > (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
     else
       if not forDashboard? or !/\S/.test(ex.name)
         id_cell.html('{'+ex.id+':'+ex.type+'}') 
