@@ -505,6 +505,7 @@ populate_main_page = (vars) ->
           (-> $(this).data('bubble').trigger('mouseenter')), \
           (-> $(this).data('bubble').trigger('mouseleave'))
         e.row.click -> $(this).data('bubble').trigger('click')
+        e.row.find('.btn').click (e) -> e.stopPropagation()
         e.row.css 'cursor', 'pointer'
     else populate_exercises_page null, true
 
