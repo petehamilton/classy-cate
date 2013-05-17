@@ -17,7 +17,7 @@ end
 # Asset Serving
 get '/classy-cate.user.js' do
   get_cache('classy-cate-user-js', settings.asset_cache_for) {
-    content_type "text/javascript"
+    content_type 'text/javascript'
     erb(:"classy_cate.user.js")
   }
 end
@@ -31,7 +31,9 @@ end
 
 get '/classy-cate.css' do
   get_cache('classy-cate-css', settings.asset_cache_for) {
-    less(:classy_cate)
+    content_type 'text/css'
+    less(:classy_cate) + less(File.read(File.join('lib','timeline.less')))
+    #less(:classy_cate)
   }
 end
 
