@@ -573,10 +573,9 @@ populate_exercises_page = (vars, forDashboard) ->
   if not forDashboard?
     $('#term_title').text('Timetable - ' + vars.term_title)
 
-
-  if vars? then for module in (m for m in modules when m.exercises[0]?) # Ignore empty module  
+  if vars? then for module in modules # Don't ignore empty module  
     if not forDashboard?
-      module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>') 
+      module_header = $("<h3>#{module.id} - #{module.name}</h3>") 
 
     if module.notesLink? and not forDashboard?
       note_link = $('<a/>').attr('href', module.notesLink).html('Notes')
@@ -592,44 +591,46 @@ populate_exercises_page = (vars, forDashboard) ->
             populate_notes(notes_data, $('#active_note').data('module_title'))
             $("#notes-modal").modal('show')
       module_header.append(" - ").append(note_link)
+      destination_div.append module_header
 
-    module_table = $('#exercises_table')
-    if not forDashboard? 
-      module_table = $('#exercises_template').clone()
-    module_table.removeClass('hidden')
+    if module.exercises[0]?
+      module_table = $('#exercises_table')
+      if not forDashboard? 
+        module_table = $('#exercises_template').clone()
+      module_table.removeClass('hidden')
 
-    for exercise in module.exercises
-      row = $('#exercise_row_template').clone()
-      if not forDashboard?
-        row.removeClass('hidden').appendTo(module_table)
-      else exercise.row = row.removeClass('hidden')  # rememeber to append
-      populate_exercise_row row, exercise
-    destination_div.append(module_header).append(module_table) if not forDashboard?
+      for exercise in module.exercises
+        row = $('#exercise_row_template').clone()
+        if not forDashboard?
+          row.removeClass('hidden').appendTo(module_table)
+        else exercise.row = row.removeClass('hidden')  # rememeber to append
+        populate_exercise_row row, exercise
+      destination_div.append(module_table) if not forDashboard?
 
-    if forDashboard? then return module.exercises
+      if forDashboard? then return module.exercises
 
-    placeholder = $('<div/ class="timeline_slider">').appendTo destination_div
-    timeline = create_timeline
-              destination : placeholder
-              structure : TIMELINE_STRUCTURE, moments : module.exercises
-    .hide()
+      placeholder = $('<div/ class="timeline_slider">').appendTo destination_div
+      timeline = create_timeline
+                destination : placeholder
+                structure : TIMELINE_STRUCTURE, moments : module.exercises
+      .hide()
 
-    timeline_icon = $('<i/ rel="tooltip" title="Toggle timeline" class="icon-time timeline_toggle">')
-      .data 
-        'clicked' : false
-        'timeline' : timeline
-        'placeholder' : placeholder
-      .bind 'click', ->
-        $(this).data 'clicked', (clicked = !$(this).data 'clicked')
-        [timeline, placeholder] = [$(this).data('timeline'), $(this).data('placeholder')]
-        if clicked
-          placeholder.animate {minHeight : 150}, {duration : 400, complete : -> timeline.fadeIn()}
-        else
-          timeline.fadeOut
-            complete : -> placeholder.animate {minHeight : 0, height : 'auto'}, {duration : 400}
-      .tooltip {placement : 'left', delay : {show : 500, hide : 100}}
+      timeline_icon = $('<i/ rel="tooltip" title="Toggle timeline" class="icon-time timeline_toggle">')
+        .data 
+          'clicked' : false
+          'timeline' : timeline
+          'placeholder' : placeholder
+        .bind 'click', ->
+          $(this).data 'clicked', (clicked = !$(this).data 'clicked')
+          [timeline, placeholder] = [$(this).data('timeline'), $(this).data('placeholder')]
+          if clicked
+            placeholder.animate {minHeight : 150}, {duration : 400, complete : -> timeline.fadeIn()}
+          else
+            timeline.fadeOut
+              complete : -> placeholder.animate {minHeight : 0, height : 'auto'}, {duration : 400}
+        .tooltip {placement : 'left', delay : {show : 500, hide : 100}}
 
-    module_header.append timeline_icon
+      module_header.append timeline_icon
 
   if not modules? or Math.max((m.exercises.length for m in vars.modules)...) <= 0
     no_modules = $('<div/>').css
