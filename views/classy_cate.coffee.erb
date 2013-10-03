@@ -48,13 +48,13 @@ load_cate_page = (url, callback) ->
     url: url
     dataType: 'html'
     success: (data) ->
-      frame = $('<iframe class="hidden" src="about:blank"/>').hide()
-      frame.appendTo('body')
-      doc = frame.get(0).contentWindow.document
-      doc.write(data)
-      body = $('body', doc).clone()
-      frame.remove()
-      callback(body)
+      data = data.split(/<body.*>/)[1].split('</body>')[0]
+      body = $('<body/>').append(data)
+      # remove icons- cates really bad at providing them for
+      # an ajax, was hanging terribly in safari
+      icons = body.find('img[src^="icons/"]')
+      icons.remove()
+      callback body
 
 
 #///////////////////////////////////////////////////////////////////////////////
@@ -468,9 +468,9 @@ populate_main_page = (vars) ->
   $('#term-selector .btn').each ->
     $(this).addClass('active') if $(this).attr('value') == period.toString()
 
-  lower = new Date() 
-  upper = new Date(lower.getTime() + 1000*60*60*24*6)
-  load_cate_page "timetable.cgi?keyt=2012:3:c1:lmj112", (body) ->#$('#nav-exercises').attr('href'), (body) ->
+  lower = new Date()
+  upper = new Date(lower.getTime() + 1000*60*60*24*7 + 1)  # to include full day
+  load_cate_page $('#nav-exercises').attr('href'), (body) ->
     vars = extract_exercise_page_data body
     [exs_due, exs_late] = [[],[]]
     for m in vars.modules
@@ -505,6 +505,7 @@ populate_main_page = (vars) ->
           (-> $(this).data('bubble').trigger('mouseenter')), \
           (-> $(this).data('bubble').trigger('mouseleave'))
         e.row.click -> $(this).data('bubble').trigger('click')
+        e.row.find('.btn').click (e) -> e.stopPropagation()
         e.row.css 'cursor', 'pointer'
     else populate_exercises_page null, true
 
@@ -526,7 +527,7 @@ populate_exercises_page = (vars, forDashboard) ->
         handin_anchor = $(document.createElement('a'))
           .attr('href',ex.handin).html('Hand in').appendTo(id_cell)
         handin_anchor.addClass(
-          if ex.due > (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
+          if ex.end > (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
     else
       if not forDashboard? or !/\S/.test(ex.name)
         id_cell.html('{'+ex.id+':'+ex.type+'}') 
@@ -572,10 +573,9 @@ populate_exercises_page = (vars, forDashboard) ->
   if not forDashboard?
     $('#term_title').text('Timetable - ' + vars.term_title)
 
-
-  if vars? then for module in (m for m in modules when m.exercises[0]?) # Ignore empty module  
+  if vars? then for module in modules # Don't ignore empty module  
     if not forDashboard?
-      module_header = $('<h3>' + module.id + ' - ' + module.name + '</h3>') 
+      module_header = $("<h3>#{module.id} - #{module.name}</h3>") 
 
     if module.notesLink? and not forDashboard?
       note_link = $('<a/>').attr('href', module.notesLink).html('Notes')
@@ -591,44 +591,46 @@ populate_exercises_page = (vars, forDashboard) ->
             populate_notes(notes_data, $('#active_note').data('module_title'))
             $("#notes-modal").modal('show')
       module_header.append(" - ").append(note_link)
+      destination_div.append module_header
 
-    module_table = $('#exercises_table')
-    if not forDashboard? 
-      module_table = $('#exercises_template').clone()
-    module_table.removeClass('hidden')
+    if module.exercises[0]?
+      module_table = $('#exercises_table')
+      if not forDashboard? 
+        module_table = $('#exercises_template').clone()
+      module_table.removeClass('hidden')
 
-    for exercise in module.exercises
-      row = $('#exercise_row_template').clone()
-      if not forDashboard?
-        row.removeClass('hidden').appendTo(module_table)
-      else exercise.row = row.removeClass('hidden')  # rememeber to append
-      populate_exercise_row row, exercise
-    destination_div.append(module_header).append(module_table) if not forDashboard?
+      for exercise in module.exercises
+        row = $('#exercise_row_template').clone()
+        if not forDashboard?
+          row.removeClass('hidden').appendTo(module_table)
+        else exercise.row = row.removeClass('hidden')  # rememeber to append
+        populate_exercise_row row, exercise
+      destination_div.append(module_table) if not forDashboard?
 
-    if forDashboard? then return module.exercises
+      if forDashboard? then return module.exercises
 
-    placeholder = $('<div/ class="timeline_slider">').appendTo destination_div
-    timeline = create_timeline
-              destination : placeholder
-              structure : TIMELINE_STRUCTURE, moments : module.exercises
-    .hide()
+      placeholder = $('<div/ class="timeline_slider">').appendTo destination_div
+      timeline = create_timeline
+                destination : placeholder
+                structure : TIMELINE_STRUCTURE, moments : module.exercises
+      .hide()
 
-    timeline_icon = $('<i/ rel="tooltip" title="Toggle timeline" class="icon-time timeline_toggle">')
-      .data 
-        'clicked' : false
-        'timeline' : timeline
-        'placeholder' : placeholder
-      .bind 'click', ->
-        $(this).data 'clicked', (clicked = !$(this).data 'clicked')
-        [timeline, placeholder] = [$(this).data('timeline'), $(this).data('placeholder')]
-        if clicked
-          placeholder.animate {minHeight : 150}, {duration : 400, complete : -> timeline.fadeIn()}
-        else
-          timeline.fadeOut
-            complete : -> placeholder.animate {minHeight : 0, height : 'auto'}, {duration : 400}
-      .tooltip {placement : 'left', delay : {show : 500, hide : 100}}
+      timeline_icon = $('<i/ rel="tooltip" title="Toggle timeline" class="icon-time timeline_toggle">')
+        .data 
+          'clicked' : false
+          'timeline' : timeline
+          'placeholder' : placeholder
+        .bind 'click', ->
+          $(this).data 'clicked', (clicked = !$(this).data 'clicked')
+          [timeline, placeholder] = [$(this).data('timeline'), $(this).data('placeholder')]
+          if clicked
+            placeholder.animate {minHeight : 150}, {duration : 400, complete : -> timeline.fadeIn()}
+          else
+            timeline.fadeOut
+              complete : -> placeholder.animate {minHeight : 0, height : 'auto'}, {duration : 400}
+        .tooltip {placement : 'left', delay : {show : 500, hide : 100}}
 
-    module_header.append timeline_icon
+      module_header.append timeline_icon
 
   if not modules? or Math.max((m.exercises.length for m in vars.modules)...) <= 0
     no_modules = $('<div/>').css
