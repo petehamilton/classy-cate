@@ -2,7 +2,7 @@
 #///////////////////////// jQuery Timeline Plugin /////////////////////////////
 #
 # AUTHOR - Lawrence Jones
-# VERSION - 1.1 / GITHUB - http://www.github.com/LawrenceJones/jQueryTimeline
+# VERSION - 1.1.1 / GITHUB - http://www.github.com/LawrenceJones/jQueryTimeline
 #
 # DESCRIPTION - A simple timeline plugin that allows a variety of different
 #               information to be processed and displayed on the timeline. There
@@ -23,15 +23,17 @@
 SETTINGS = null
 
 default_settings = ->
+  $.fx.interval = 8  # increases animation speed
   SETTINGS = {  # All lefts are percentages
     container : null, spine : null
     start_date : null, end_date : null
     intervals : [], no_of_intervals : 0
-    structure : {}, moments : []
+    clash_sensitivity : {h : 5, v : 6}  # the amount of pixels clash detection
+    structure : {}, moments : []        # extends out from the info box
     pct_buffer_for_markers : 3, spine_buffer : 5
     initial_heights :
-        up   : [-14, -30, -38]
-        down : [  8,  10,  14]
+        up   : [ -18, -34, -42, -44]
+        down : [  12,  14,  18,  20]
 
     # Return the marker index of the given date
     date_to_marker_index : (d) ->
@@ -115,7 +117,10 @@ create_spine = (destination, SETTINGS) ->
 create_interval_markers = (spine) ->
 
   set_priority = (interval) ->
-    if interval.date == 1 then interval.priority = 3
+    console.log 
+    if 0 <= (today.getTime() - interval.js_date.getTime())/24/60/60 < 1000
+      interval.priority = 4
+    else if interval.date == 1 then interval.priority = 3
     else if interval.day == 1 then interval.priority = 2
     else interval.priority = 1
 
@@ -140,6 +145,7 @@ create_interval_markers = (spine) ->
     $('<div/ class="interval_label p' + interval.priority + '">')
       .css {left:SETTINGS.date_to_marker_left_pct(interval.js_date) + '%'}
 
+  today = new Date()
   for interval in (intervals = produce_intervals())
     left = SETTINGS.date_to_marker_left_pct(interval.js_date) + '%'
     $('<div/ class="interval_marker p' + interval.priority + '">')
@@ -148,6 +154,7 @@ create_interval_markers = (spine) ->
       .appendTo spine
     int_lbl = build_label interval
     switch interval.priority
+      when 4 then int_lbl.text 'Now'
       when 3 then int_lbl.text month_num_to_name interval.month
       when 2 then int_lbl.text "Mon #{interval.date}"
     if int_lbl.priority != 1 then int_lbl.appendTo spine
@@ -276,8 +283,9 @@ create_moments = (spine) ->
         m.goal_top = top
 
       m.clash_with = (m) ->
-        vertical = (us, them) -> !((us.t > them.b-3) or (them.t+3 > us.b))
-        horizontal = (us, them) -> !((us.irm < them.ilm) or (them.irm < us.ilm))
+        sens = SETTINGS.clash_sensitivity
+        vertical = (us, them) -> !((us.t > them.b-sens.v) or (them.t + sens.v > us.b))
+        horizontal = (us, them) -> !((us.irm < them.ilm - sens.h) or (them.irm < us.ilm - sens.h))
         [us, them] = [@get_projected_css(), m.get_projected_css()]
         [us.t, us.b, them.t, them.b] = [@goal_top, @bottom(), m.goal_top, m.bottom()]
         [v, h] = [vertical(us, them), horizontal(us,them)]
