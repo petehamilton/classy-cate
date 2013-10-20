@@ -469,8 +469,8 @@ populate_main_page = (vars) ->
     $(this).addClass('active') if $(this).attr('value') == period.toString()
 
   # to include current day
-  lower = new Date()
-  upper = new Date(lower.getTime() + 1000*60*60*24*7 + 1)
+  lower = new Date((new Date()).getTime() - 1000*60*60*24)
+  upper = new Date(lower.getTime() + 1000*60*60*24*7)
   load_cate_page $('#nav-exercises').attr('href'), (body) ->
     vars = extract_exercise_page_data body
     [exs_due, exs_late] = [[],[]]
