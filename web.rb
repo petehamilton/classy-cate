@@ -5,6 +5,7 @@ require 'heroku'
 require 'coffee-script'
 require 'less'
 require 'dalli'
+require 'memcachier'
 
 require './config/environments'
 require './config/cache'

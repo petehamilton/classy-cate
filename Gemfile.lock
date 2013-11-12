@@ -26,6 +26,7 @@ GEM
     less (2.2.2)
       commonjs (~> 0.2.6)
     libv8 (3.3.10.4)
+    memcachier (0.0.2)
     mime-types (1.17.2)
     multi_json (1.5.0)
     netrc (0.7.7)
@@ -60,6 +61,7 @@ DEPENDENCIES
   haml
   heroku
   less
+  memcachier
   netrc
   sinatra
   therubyracer

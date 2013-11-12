@@ -1,4 +1,5 @@
-source :rubygems
+source 'https://rubygems.org'
+
 gem 'sinatra'
 gem 'heroku'
 gem 'git-ssh-wrapper'
@@ -9,4 +10,5 @@ gem 'less'
 gem 'haml'
 gem 'therubyracer'
 gem 'dalli'
+gem 'memcachier'
 gem 'thin'
