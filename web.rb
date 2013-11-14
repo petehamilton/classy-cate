@@ -27,15 +27,16 @@ end
 get '/classy-cate.js' do
   get_cache('classy-cate-js', settings.asset_cache_for) {
     content_type "text/javascript"
-    coffee(erb(:"classy_cate.coffee")) + coffee(File.read(File.join('lib','timeline.coffee')))
+    coffee(erb(:"classy_cate.coffee")) +
+    coffee(:timeline)
   }
 end
 
 get '/classy-cate.css' do
   get_cache('classy-cate-css', settings.asset_cache_for) {
     content_type 'text/css'
-    less(:classy_cate) + less(File.read(File.join('lib','timeline.less')))
-    #less(:classy_cate)
+    less(:classy_cate) +
+    less(:timeline)
   }
 end
 
@@ -66,9 +67,6 @@ end
 post '/post-receive' do
   require_relative 'lib/init'
   data = JSON.parse(params[:payload])
-  # if data["repository"]["private"]
-  #   "freak out"
-  # end
   url = data["repository"]["url"]
   GitPusher.deploy(url)
   begin
