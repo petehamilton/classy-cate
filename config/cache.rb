@@ -6,13 +6,13 @@ def get_cache(index, timeout, &block)
     result = settings.cache.get(index)
     if result.nil?
       result = block.call
-      puts "CACHE: Setting #{index}"
+      logger.info "CACHE: Setting #{index}"
       settings.cache.set(index, result, timeout)
     else
-      puts "CACHE: Retrieving #{index}"
+      logger.info "CACHE: Retrieving #{index}"
     end
   rescue *[Dalli::RingError, Dalli::NetworkError]
-    puts "CACHE: Failed #{index}"
+    logger.info "CACHE: Failed #{index}"
     result = block.call
   end
   return result

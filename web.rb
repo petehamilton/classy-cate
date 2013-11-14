@@ -4,6 +4,7 @@ require 'git'
 require 'heroku'
 require 'coffee-script'
 require 'less'
+require 'logger'
 require 'dalli'
 require 'memcachier'
 
