@@ -10,29 +10,20 @@ CATE, without ~~the~~ as much hurt.
     - Install [TamperMonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en)
     - Visit http://classy-cate.herokuapp.com/classy-cate.user.js
     - Agree/Install
-    - Alternatively, install it as a Chrome user script
+    - Alternatively, install it as a [third party user script](http://solidsprite.com/2012/08/how-to-install-third-party-userscripts-in-chrome-mac-os-x/)
   - [Firefox](http://www.mozilla.org/en-US/firefox/new/)
     - Install [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)
     - Visit http://classy-cate.herokuapp.com/classy-cate.user.js
     - Agree/Install
 
-- TamperMonkey is a great chrome extension for this. (Thanks to @vahokif)
-- [Allow Third party Chrome Scripts](http://solidsprite.com/2012/08/how-to-install-third-party-userscripts-in-chrome-mac-os-x/)
-- [Enabling 3rd Party Chrome user scripts](http://userscripts.org/topics/113176) (OSX)
-
 ## Rough TODO List (Please Help)
 
-- **Make Timetable Page smoother/prettier**
 - Scrub last vestige of CATE from homepage - the favicon! Use [this](http://stackoverflow.com/questions/260857/changing-website-favicon-dynamically/260876#260876)
 - Non-Undergrads may experience missing/broken links. I have no idea.
 
 ## Ideas
 
-- Timetable page
-  - Work on condensed version for dashboard
-  - Notify of upcoming deadlines
-  - Aggregate links to notes, exercises without jumping around a huge
-  table, possibly include a download all function?
+- Put yours here!
 
 ## Development
 
