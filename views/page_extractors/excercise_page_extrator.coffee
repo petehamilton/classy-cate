@@ -1,5 +1,4 @@
 class ExcercisePageExtractor extends PageExtractor
-
   extract: ->
     # Extracts full title e.g. Spring Term 2012-2013
     extract_term_title = (html) ->
