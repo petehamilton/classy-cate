@@ -7,7 +7,7 @@ load_dashboard_page = (e) ->
   window.location.hash = "dashboard"
   url = $('#nav-dashboard').attr('href')
   load_cate_page url, (body) ->
-    vars = (new MainPageExtractor(body)).extract
+    vars = (new MainPageScraper(body)).extract
     populate_html('#page-content', MAIN_PAGE_TEMPLATE_HTML)
     (new MainPagePopulator($('#page-content'), vars)).populate
 
@@ -16,7 +16,7 @@ load_grades_page = (e) ->
   e.preventDefault() if e?
   window.location.hash = "grades"
   load_cate_page $('#nav-grades').attr('href'), (body) ->
-    vars = (new GradesPageExtractor(body)).extract
+    vars = (new GradesPageScraper(body)).extract
     populate_html('#page-content', GRADES_PAGE_TEMPLATE_HTML)
     (new GradesPagePopulator($('#page-content'), vars)).populate
 

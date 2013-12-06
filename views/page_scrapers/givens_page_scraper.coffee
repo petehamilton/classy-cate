@@ -1,4 +1,4 @@
-class GivensPageExtractor extends GivensPageExtractor
+class GivensPageScraper extends GivensPageScraper
   extract: ->
     categories = []
 

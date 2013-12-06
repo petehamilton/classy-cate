@@ -2,7 +2,7 @@
 # Extracts the course notes
 #///////////////////////////////////////////////////////////////////////////////
 
-class NotesPageExtractor extends NotesPageExtractor
+class NotesPageScraper extends NotesPageScraper
   extract: ->
     notes = []
     for row in get_note_rows(@html)

@@ -28,8 +28,8 @@ TIMELINE_STRUCTURE = {
 # Add Other Coffee Files
 #///////////////////////////////////////////////////////////////////////////////
 
-# Extractors
-<% Dir["views/page_extractors/*.coffee"].each do |pt| %>
+# Scrapers
+<% Dir["views/page_scrapers/*.coffee"].each do |pt| %>
 
 <%= File.read(pt) %>
 

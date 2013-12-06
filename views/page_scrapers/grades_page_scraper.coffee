@@ -1,4 +1,4 @@
-class GradesPageExtractor extends PageExtractor
+class GradesPageScraper extends PageScraper
   extract: ->
     process_header_row = (row) ->
       # TODO: Regex out the fluff

@@ -1,4 +1,4 @@
-class MainPageExtractor extends Extractor
+class MainPageScraper extends Scraper
   extract: ->
     current_url = document.URL
     current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check
