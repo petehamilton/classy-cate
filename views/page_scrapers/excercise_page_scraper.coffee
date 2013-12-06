@@ -1,5 +1,5 @@
 class ExcercisePageScraper extends PageScraper
-  extract: ->
+  scrape_vars: ->
     # Extracts full title e.g. Spring Term 2012-2013
     extract_term_title = (html) ->
       html.find('tr').eq(0).find('h1').eq(0).text()

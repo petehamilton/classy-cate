@@ -7,5 +7,5 @@ class PageScraper
   constructor: (html) ->
     @html = html
 
-  extract: ->
-    throw ".extract method of PageScraper should be overriden!"
+  scrape_vars: ->
+    throw ".scrape method of PageScraper should be overriden!"

@@ -1,5 +1,5 @@
 class MainPageScraper extends Scraper
-  extract: ->
+  scrape_vars: ->
     current_url = document.URL
     current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check
     current_user = current_url.match("[0-9]+:(.*)")[1] # TODO: Error Check

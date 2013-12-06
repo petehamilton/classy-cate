@@ -1,5 +1,5 @@
 class GivensPageScraper extends GivensPageScraper
-  extract: ->
+  scrape_vars: ->
     categories = []
 
     # Select the tables

@@ -1,5 +1,5 @@
 class GradesPageScraper extends PageScraper
-  extract: ->
+  scrape_vars: ->
     process_header_row = (row) ->
       # TODO: Regex out the fluff
       return {

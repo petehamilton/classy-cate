@@ -3,7 +3,7 @@
 #///////////////////////////////////////////////////////////////////////////////
 
 class NotesPageScraper extends NotesPageScraper
-  extract: ->
+  scrape_vars: ->
     notes = []
     for row in get_note_rows(@html)
       notes.push {
