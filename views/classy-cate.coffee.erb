@@ -61,10 +61,10 @@ activate_nostalgia_mode = ->
     alert('Computer says NO.')
 
 redirect_if_necessary = ->
-  if /student/i.test(document.URL)
+  if /student\.cgi/i.test(document.URL)
     window.location = "/#grades"
 
-  if /timetable/i.test(document.URL)
+  if /timetable\.cgi/i.test(document.URL)
     window.location = "/#timetable"
 
 #///////////////////////////////////////////////////////////////////////////////
