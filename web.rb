@@ -16,7 +16,7 @@ get '/' do
   redirect "https://github.com/petehamilton/classy-cate#classy-cate"
 end
 
-# Asset Serving
+# Serve UserScript
 get '/classy-cate.user.js' do
   content_type 'application/javascript'
   get_cache('classy-cate-user-js', settings.asset_cache_for) {
@@ -24,6 +24,7 @@ get '/classy-cate.user.js' do
   }
 end
 
+# Serve ClassyCATE JS
 get '/classy-cate.js' do
   content_type 'application/javascript'
   get_cache('classy-cate-js', settings.asset_cache_for) {
@@ -31,16 +32,18 @@ get '/classy-cate.js' do
   }
 end
 
-get '/classy-cate.coffee' do
-  content_type 'text/text'
-  erb(:"classy-cate.coffee")
-end
-
+# Serve ClassyCATE CSS
 get '/classy-cate.css' do
   content_type 'text/css'
   get_cache('classy-cate-css', settings.asset_cache_for) {
     less(:"classy-cate")
   }
+end
+
+# Serve uncompiled coffeescript - debugging
+get '/classy-cate.coffee' do
+  content_type 'text/text'
+  erb(:"classy-cate.coffee")
 end
 
 ####################################################################
