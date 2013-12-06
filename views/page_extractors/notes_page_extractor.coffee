@@ -1,25 +1,37 @@
 class NotesPageExtractor extends NotesPageExtractor
   extract: ->
-    process_notes_rows = (html) ->
-      html.find('table [cellpadding="3"]').find('tr')[1..]
-
     notes = []
-    for row in ($(r) for r in process_notes_rows(@html)
-      title = row.find('td:eq(1)').text()
-      link = $(row.find('td:eq(1) a'))
-      if link.attr('href')? && link.attr('href') != ''
-        notes.push {
-          type: "resource"
-          title: title
-          link: link.attr('href')
-        }
-      else if link.attr('onclick')? # Remote page
-        identifier = link.attr('onclick').match(/clickpage\((.*)\)/)[1]
-        href = "showfile.cgi?key=2012:3:#{identifier}:c3:NOTES:peh10"
-        notes.push {
-          type: "url"
-          title : title
-          link : href
-        }
-
+    for row in get_note_rows(@html)
+      notes.push {
+        type: get_note_type(row)
+        title : get_note_title(row)
+        link : get_note_link(row)
+      }
     return { notes: notes }
+
+  get_note_rows = (html) ->
+    ($(r) for r in html.find('table [cellpadding="3"]').find('tr')[1..])
+
+  get_note_type: (row) ->
+    if link_is_local(link)
+      return "resource"
+    else if link_is_remote(link)
+      return "url"
+
+  get_note_title: (row) ->
+    note_title = row.find('td:eq(1)').text()
+
+  get_note_link: (row) ->
+    link = $(row.find('td:eq(1) a'))
+    if link_is_local(link)
+      return link.attr('href')
+    else if link_is_remote(link)
+      identifier = link.attr('onclick').match(/clickpage\((.*)\)/)[1]
+      return "showfile.cgi?key=2012:3:#{identifier}:c3:NOTES:peh10"
+    return null
+
+  link_is_local: (link) ->
+    link.attr('href')? && link.attr('href') != ''
+
+  link_is_remote: (link) ->
+    link.attr('onclick')?
