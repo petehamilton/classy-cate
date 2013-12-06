@@ -33,11 +33,16 @@ TIMELINE_STRUCTURE = {
 <%= File.read("views/page_scrapers/page_scraper.coffee") %>
 <%= File.read("views/page_scrapers/main_page_scraper.coffee") %>
 <%= File.read("views/page_scrapers/grades_page_scraper.coffee") %>
+<%= File.read("views/page_scrapers/exercise_page_scraper.coffee") %>
+<%= File.read("views/page_scrapers/notes_page_scraper.coffee") %>
 
 <%= File.read("views/populators/page_populator.coffee") %>
 <%= File.read("views/populators/layout_populator.coffee") %>
 <%= File.read("views/populators/dashboard_populator.coffee") %>
 <%= File.read("views/populators/grades_populator.coffee") %>
+<%= File.read("views/populators/exercise_populator.coffee") %>
+<%= File.read("views/populators/exercise_row_populator.coffee") %>
+<%= File.read("views/populators/notes_populator.coffee") %>
 
 <%= File.read("views/misc/page_loaders.coffee") %>
 
@@ -65,7 +70,7 @@ redirect_if_necessary = ->
     window.location = "/#grades"
 
   if /timetable\.cgi/i.test(document.URL)
-    window.location = "/#timetable"
+    window.location = "/#exercises"
 
 #///////////////////////////////////////////////////////////////////////////////
 # Utils
@@ -99,7 +104,7 @@ init_page = ->
   init_layout()
   switch (window.location.hash).replace('#', '')
     when "grades" then load_grades_page()
-    when "timetable" then load_exercises_page()
+    when "exercises" then load_exercises_page()
     else load_dashboard_page()
 
 add_todo_message = ->

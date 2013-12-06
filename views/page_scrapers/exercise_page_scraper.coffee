@@ -1,4 +1,4 @@
-class ExcercisePageScraper extends PageScraper
+class ExercisePageScraper extends PageScraper
   scrape_vars: ->
     # Extracts full title e.g. Spring Term 2012-2013
     extract_term_title = (html) ->
