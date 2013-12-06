@@ -10,21 +10,22 @@ load_cate_page = (url, callback) ->
     success: (data) ->
       data = data.split(/<body.*>/)[1].split('</body>')[0]
       body = $('<body/>').append(data)
-      # remove icons- cates really bad at providing them for
+      # remove icons - cates really bad at providing them for
       # an ajax, was hanging terribly in safari
       icons = body.find('img[src^="icons/"]')
       icons.remove()
       callback body
 
 load_dashboard_page = (e) ->
-  # e.preventDefault() if e?
-  # window.location.hash = "dashboard"
-  # url = $('#nav-dashboard').attr('href')
-  # load_cate_page url, (body) ->
-  #   vars = (new MainPageScraper(body)).extract
-  #   populate_html('#page-content', MAIN_PAGE_TEMPLATE_HTML)
-  #   (new MainPagePopulator($('#page-content'), vars)).populate
-
+  e.preventDefault() if e?
+  window.location.hash = "dashboard"
+  url = $('#nav-dashboard').attr('href')
+  load_cate_page url, (old_body) ->
+    scraper = new MainPageScraper old_body
+    populator = new DashboardPopulator $('body')
+    vars = scraper.scrape_vars()
+    replace_html('#page-content', DASHBOARD_PAGE_TEMPLATE_HTML)
+    populator.populate(vars)
 
 load_grades_page = (e) ->
   # e.preventDefault() if e?

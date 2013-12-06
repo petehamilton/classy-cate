@@ -1,6 +1,5 @@
 class LayoutPopulator extends PagePopulator
   populate: (vars) ->
-    console.log(vars)
     @html.find('#cc-version').html(vars.version)
     @html.find('#nav-dashboard').attr('href', vars.current_url)
     @html.find('#nav-exercises').attr('href', vars.timetable_url)
