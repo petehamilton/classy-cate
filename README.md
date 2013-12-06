@@ -27,11 +27,13 @@ CATE, without ~~the~~ as much hurt.
 
 ## Development
 
+**TODO: These are out of date!!**
 To develop and help improve classy-cate, do the following:
 
-1. Run the server with `thin start -p 4567 --ssl`
+1. Install gems: `bundle install`
+1. Run the server with `foreman start`
 2. Modify `classy-cate.user.js` to point to your local server assets
-3. Modify `views/classy_cate.coffee.erb` and `views/classy_cate.less` to add/modify functionality as you wish!
+3. Modify `views/classy-cate.coffee.erb` and `views/classy-cate.less` to add/modify functionality as you wish!
 
 ## Want to help, but don't have a clue?
 
