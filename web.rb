@@ -19,18 +19,14 @@ end
 # Asset Serving
 get '/classy-cate.user.js' do
   content_type 'application/javascript'
-
   get_cache('classy-cate-user-js', settings.asset_cache_for) {
-    content_type 'text/javascript'
     erb(:"classy-cate.user.js")
   }
 end
 
 get '/classy-cate.js' do
   content_type 'application/javascript'
-
   get_cache('classy-cate-js', settings.asset_cache_for) {
-    content_type "text/javascript"
     coffee(erb(:"classy-cate.coffee"))
   }
 end
@@ -42,9 +38,7 @@ end
 
 get '/classy-cate.css' do
   content_type 'text/css'
-
   get_cache('classy-cate-css', settings.asset_cache_for) {
-    content_type 'text/css'
     less(:"classy-cate")
   }
 end
