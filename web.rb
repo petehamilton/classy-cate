@@ -13,7 +13,7 @@ require './config/cache'
 require './config/version'
 
 get '/' do
-  redirect "https://github.com/PeterHamilton/classy-cate#classy-cate"
+  redirect "https://github.com/petehamilton/classy-cate#classy-cate"
 end
 
 # Asset Serving
@@ -22,7 +22,7 @@ get '/classy-cate.user.js' do
 
   get_cache('classy-cate-user-js', settings.asset_cache_for) {
     content_type 'text/javascript'
-    erb(:"classy_cate.user.js")
+    erb(:"classy-cate.user.js")
   }
 end
 
@@ -31,14 +31,13 @@ get '/classy-cate.js' do
 
   get_cache('classy-cate-js', settings.asset_cache_for) {
     content_type "text/javascript"
-    coffee(erb(:"classy_cate.coffee")) +
-    coffee(:timeline)
+    coffee(erb(:"classy-cate.coffee"))
   }
 end
 
 get '/classy-cate.coffee' do
   content_type 'text/text'
-  erb(:"classy_cate.coffee")
+  erb(:"classy-cate.coffee")
 end
 
 get '/classy-cate.css' do
@@ -46,8 +45,7 @@ get '/classy-cate.css' do
 
   get_cache('classy-cate-css', settings.asset_cache_for) {
     content_type 'text/css'
-    less(:classy_cate) +
-    less(:timeline)
+    less(:"classy-cate")
   }
 end
 
