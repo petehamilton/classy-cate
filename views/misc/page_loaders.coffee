@@ -28,12 +28,15 @@ load_dashboard_page = (e) ->
     populator.populate(vars)
 
 load_grades_page = (e) ->
-  # e.preventDefault() if e?
-  # window.location.hash = "grades"
-  # load_cate_page $('#nav-grades').attr('href'), (body) ->
-  #   vars = (new GradesPageScraper(body)).extract
-  #   populate_html('#page-content', GRADES_PAGE_TEMPLATE_HTML)
-  #   (new GradesPagePopulator($('#page-content'), vars)).populate
+  e.preventDefault() if e?
+  window.location.hash = "grades"
+  url = $('#nav-grades').attr('href')
+  load_cate_page url, (old_body) ->
+    scraper = new GradesPageScraper old_body
+    populator = new GradesPopulator $('body')
+    vars = scraper.scrape_vars()
+    replace_html('#page-content', GRADES_PAGE_TEMPLATE_HTML)
+    populator.populate(vars)
 
 load_exercises_page = (e, fallback, shifting, url) ->
 
