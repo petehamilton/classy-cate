@@ -49,7 +49,9 @@ get '/classy-cate.css' do
   }
 end
 
-# Auto Deploy Methods
+####################################################################
+# AUTO DEPLOY METHODS - DO NOT CHANGE!
+####################################################################
 get '/public_key' do
   require_relative 'lib/init'
   ::CURRENT_SSH_KEY
