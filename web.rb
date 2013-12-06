@@ -36,6 +36,11 @@ get '/classy-cate.js' do
   }
 end
 
+get '/classy-cate.coffee' do
+  content_type 'text/text'
+  erb(:"classy_cate.coffee")
+end
+
 get '/classy-cate.css' do
   content_type 'text/css'
 

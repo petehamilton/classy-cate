@@ -1,4 +1,5 @@
-= haml :grading_schema
+= haml :"page_templates/_grading_schema"
+
 #identity-container.row
   .span8
     %h1.section-header Identity
@@ -89,7 +90,7 @@
 %hr
 #exercises-container.row
   .span12
-    %h1.section-header 
+    %h1.section-header
       Exercises
       #exercise-nav
         #term-selector.btn-group{"data-toggle" => 'buttons-radio'}
@@ -99,9 +100,9 @@
           %button.btn{:value => "6"} June-July
         %br
         %button.btn#ex-go-btn Go!
-        %span#current-class.label 
-        #class-selector.btn-group 
-          %a.btn.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"} 
+        %span#current-class.label
+        #class-selector.btn-group
+          %a.btn.dropdown-toggle{"data-toggle" => "dropdown", :href => "#"}
             Select Class
             %span.caret
           %ul.dropdown-menu

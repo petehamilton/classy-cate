@@ -1,0 +1,77 @@
+#///////////////////////////////////////////////////////////////////////////////
+# Templates and Important Variables
+#///////////////////////////////////////////////////////////////////////////////
+
+LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
+
+<%
+  Dir["views/page_templates/*_template.haml"].each do |pt|
+    absolute = pt.gsub('.haml','')
+    variable_name = absolute.gsub('views/page_templates/','').upcase
+    variable_content = Rack::Utils.escape_html(haml :"#{absolute.gsub('views/', '')}").gsub("\n", "")
+%>
+<%= variable_name %>_HTML = '<%= variable_content %>';
+<% end %>
+
+CLASSY_CATE_SCRIPT_VERSION = "<%= settings.userscript_version %>"
+
+PERIOD = null
+
+TIMELINE_STRUCTURE = {
+      title : ['id','type']
+      extendedTitle : ['name']
+      content :
+        names : ['HAND IN', 'SPEC', 'GIVENS']
+        keys : ['handin', 'spec', 'given_element']
+  }
+
+#///////////////////////////////////////////////////////////////////////////////
+# Add Other Coffee Files
+#///////////////////////////////////////////////////////////////////////////////
+
+<% Dir["views/page_extractors/*.coffee"].each do |pt| %>
+
+<%= File.read(pt) %>
+
+<% end %>
+
+<% Dir["views/populators/*.coffee"].each do |pt| %>
+
+<%= File.read(pt) %>
+
+<% end %>
+
+<%= File.read('views/misc/helpers.coffee') %>
+
+<%= File.read('views/misc/page_loaders.coffee') %>
+
+#///////////////////////////////////////////////////////////////////////////////
+# Main Code
+#///////////////////////////////////////////////////////////////////////////////
+
+initial_load = ->
+  current_url = document.URL
+  if /personal/i.test(current_url)
+    load_css()
+    hash = (window.location.hash).replace('#', '')
+
+    main_page_vars = extract_main_page_data($('body'))
+    populate_html('body', LAYOUT_TEMPLATE_HTML)
+    populate_layout(main_page_vars)
+
+    if hash == "grades"
+      load_grades_page()
+    else if hash == "timetable"
+      load_exercises_page()
+    else
+      load_dashboard_page()
+  else if /student/i.test(current_url)
+    window.location = "/#grades"
+  else if /timetable/i.test(current_url)
+    window.location = "/#timetable"
+  else
+    cate_notice = $('<div>Classy CATE hasn\'t been implemented for this page yet<br/><a href="https://github.com/PeterHamilton/classy-cate">Implement it!</a></div>')
+    cate_notice.attr('style', 'padding: 20px; margin-bottom: 20px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); border: 3px solid #eed3d7; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #b94a48; background-color: #f2dede; font-size: 18px; text-align: center;')
+    $('body').prepend(cate_notice)
+
+initial_load()
