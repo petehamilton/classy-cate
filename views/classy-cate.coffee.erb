@@ -2,8 +2,6 @@
 # Templates and Important Variables
 #///////////////////////////////////////////////////////////////////////////////
 
-LAYOUT_HTML = '<%= Rack::Utils.escape_html(haml :layout).gsub("\n", "") %>'
-
 <%
   Dir["views/page_templates/*_template.haml"].each do |pt|
     absolute = pt.gsub('.haml','')
@@ -18,32 +16,38 @@ CLASSY_CATE_SCRIPT_VERSION = "<%= settings.userscript_version %>"
 PERIOD = null
 
 TIMELINE_STRUCTURE = {
-      title : ['id','type']
-      extendedTitle : ['name']
-      content :
-        names : ['HAND IN', 'SPEC', 'GIVENS']
-        keys : ['handin', 'spec', 'given_element']
+  title: ['id','type']
+  extendedTitle: ['name']
+  content: {
+    names: ['HAND IN', 'SPEC', 'GIVENS']
+    keys: ['handin', 'spec', 'given_element']
   }
+}
 
 #///////////////////////////////////////////////////////////////////////////////
 # Add Other Coffee Files
 #///////////////////////////////////////////////////////////////////////////////
 
+# Extractors
 <% Dir["views/page_extractors/*.coffee"].each do |pt| %>
 
 <%= File.read(pt) %>
 
 <% end %>
 
+# Populators
 <% Dir["views/populators/*.coffee"].each do |pt| %>
 
 <%= File.read(pt) %>
 
 <% end %>
 
-<%= File.read('views/misc/helpers.coffee') %>
+# Misc
+<% Dir["views/misc/*.coffee"].each do |pt| %>
 
-<%= File.read('views/misc/page_loaders.coffee') %>
+<%= File.read(pt) %>
+
+<% end %>
 
 #///////////////////////////////////////////////////////////////////////////////
 # Main Code
