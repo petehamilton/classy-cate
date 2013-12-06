@@ -1,4 +1,4 @@
-class MainPageScraper extends Scraper
+class MainPageScraper extends PageScraper
   scrape_vars: ->
     current_url = document.URL
     current_year = current_url.match("keyp=([0-9]+)")[1] #TODO: Error check

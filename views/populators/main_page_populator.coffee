@@ -8,10 +8,6 @@ class MainPagePopulator extends PagePopulator
     @html.find('#cc-identity-candidate-number').html(@vars.candidate_number)
     @html.find('#cc-identity-cid').html(@vars.cid)
     @html.find('#cc-identity-personal-tutor').html(@vars.personal_tutor)
-
-    @vars.available_years.each (i, val) ->
-      @html.find('#cc-year-dropdown').append '<li><a href="' + val.href + '">' + val.text + '</a></li>'
-
     @html.find('#cc-other-projects-portal').attr('href', @vars.projects_portal_link)
     @html.find('#cc-other-extensions').attr('href', @vars.extensions_link)
     @html.find('#cc-other-documentation').attr('href', @vars.documentation_link)

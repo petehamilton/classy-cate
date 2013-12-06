@@ -1,7 +1,6 @@
 class PagePopulator
   constructor: (html, vars) ->
     @html = html
-    @vars = vars
 
-  populate: ->
+  populate: (vars) ->
     throw ".populate method of PagePopulator should be overriden!"

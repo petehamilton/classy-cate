@@ -30,54 +30,85 @@ TIMELINE_STRUCTURE = {
 # Add Other Coffee Files
 #///////////////////////////////////////////////////////////////////////////////
 
-# Scrapers
-<% Dir["views/page_scrapers/*.coffee"].each do |pt| %>
+<%= File.read("views/page_scrapers/page_scraper.coffee") %>
+<%= File.read("views/page_scrapers/main_page_scraper.coffee") %>
 
-<%= File.read(pt) %>
+<%= File.read("views/populators/page_populator.coffee") %>
+<%= File.read("views/populators/layout_populator.coffee") %>
 
-<% end %>
+<%= File.read("views/misc/page_loaders.coffee") %>
 
-# Populators
-<% Dir["views/populators/*.coffee"].each do |pt| %>
-
-<%= File.read(pt) %>
-
-<% end %>
-
+#///////////////////////////////////////////////////////////////////////////////
 # Misc
-<% Dir["views/misc/*.coffee"].each do |pt| %>
+#///////////////////////////////////////////////////////////////////////////////
 
-<%= File.read(pt) %>
+activate_nostalgia_mode = ->
+  nostalgia_colors = ['Teal', 'DarkCyan', 'DeepSkyBlue', 'DarkTurquoise', 'MediumSpringGreen',
+                     'Lime', 'SpringGreen', 'Aqua', 'Cyan', 'MidnightBlue', 'DodgerBlue',
+                     'LightSeaGreen', 'Turquoise', 'RoyalBlue', 'SteelBlue', 'MediumTurquoise',
+                     'CadetBlue', 'CornflowerBlue', 'MediumAquaMarine']
 
-<% end %>
+  $('body, footer, div, span, td, input').each (index, elem) ->
+    random_nostalgia_color = nostalgia_colors[Math.floor(Math.random()*nostalgia_colors.length)]
+    $(elem).css('background', random_nostalgia_color)
+
+  $('#old-cate-button').unbind()
+  $('#old-cate-button').html("Mother of God, make it stop!")
+  $('#old-cate-button').bind 'click', ->
+    alert('Computer says NO.')
+
+redirect_if_necessary = ->
+  if /student/i.test(document.URL)
+    window.location = "/#grades"
+
+  if /timetable/i.test(document.URL)
+    window.location = "/#timetable"
+
+#///////////////////////////////////////////////////////////////////////////////
+# Utils
+#///////////////////////////////////////////////////////////////////////////////
+
+replace_html = (element, raw) ->
+  $(element).html($("<div/>").html(raw).text())
+
+text_extract = (html) ->
+  html.text().trim().replace(/(\r\n|\n|\r)/gm,"");
 
 #///////////////////////////////////////////////////////////////////////////////
 # Main Code
 #///////////////////////////////////////////////////////////////////////////////
 
-initial_load = ->
-  current_url = document.URL
-  if /personal/i.test(current_url)
-    load_css()
-    hash = (window.location.hash).replace('#', '')
+init_css = ->
+  # Let's Bootstrap this shizzle. Files from http://www.bootstrapcdn.com/?v=01282013154951
+  $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css" type="text/css" />');
+  $('head').append('<link rel="stylesheet" href="<%= settings.cc_css_url %>" type="text/css" />');
 
-    main_page_vars = extract_main_page_data($('body'))
-    populate_html('body', LAYOUT_TEMPLATE_HTML)
-    populate_layout(main_page_vars)
+init_layout = ->
+  scraper = new MainPageScraper $('body')
+  populator = new LayoutPopulator $('body')
+  vars = scraper.scrape_vars()
+  replace_html('body', LAYOUT_TEMPLATE_HTML)
+  populator.populate(vars)
 
-    if hash == "grades"
-      load_grades_page()
-    else if hash == "timetable"
-      load_exercises_page()
-    else
-      load_dashboard_page()
-  else if /student/i.test(current_url)
-    window.location = "/#grades"
-  else if /timetable/i.test(current_url)
-    window.location = "/#timetable"
+init_page = ->
+  init_css()
+  init_layout()
+  switch (window.location.hash).replace('#', '')
+    when "grades" then load_grades_page()
+    when "timetable" then load_exercises_page()
+    else load_dashboard_page()
+
+add_todo_message = ->
+  cate_notice = $('<div>Classy CATE hasn\'t been implemented for this page yet<br/><a href="https://github.com/PeterHamilton/classy-cate">Implement it!</a></div>')
+  cate_notice.attr('style', 'padding: 20px; margin-bottom: 20px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); border: 3px solid #eed3d7; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #b94a48; background-color: #f2dede; font-size: 18px; text-align: center;')
+  $('body').prepend(cate_notice)
+
+boot_classy_cate = ->
+  redirect_if_necessary()
+  if /personal/i.test(document.URL)
+    init_page()
   else
-    cate_notice = $('<div>Classy CATE hasn\'t been implemented for this page yet<br/><a href="https://github.com/PeterHamilton/classy-cate">Implement it!</a></div>')
-    cate_notice.attr('style', 'padding: 20px; margin-bottom: 20px; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5); border: 3px solid #eed3d7; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #b94a48; background-color: #f2dede; font-size: 18px; text-align: center;')
-    $('body').prepend(cate_notice)
+    add_todo_message()
 
-initial_load()
+boot_classy_cate()

@@ -1,4 +1,4 @@
-class GivensPageScraper extends GivensPageScraper
+class GivensPageScraper extends PageScraper
   scrape_vars: ->
     categories = []
 
