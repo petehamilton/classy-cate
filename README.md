@@ -10,37 +10,30 @@ CATE, without ~~the~~ as much hurt.
     - Install [TamperMonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en)
     - Visit http://classy-cate.herokuapp.com/classy-cate.user.js
     - Agree/Install
-    - Alternatively, install it as a Chrome user script
+    - Alternatively, install it as a [third party user script](http://solidsprite.com/2012/08/how-to-install-third-party-userscripts-in-chrome-mac-os-x/)
   - [Firefox](http://www.mozilla.org/en-US/firefox/new/)
     - Install [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)
     - Visit http://classy-cate.herokuapp.com/classy-cate.user.js
     - Agree/Install
 
-- TamperMonkey is a great chrome extension for this. (Thanks to @vahokif)
-- [Allow Third party Chrome Scripts](http://solidsprite.com/2012/08/how-to-install-third-party-userscripts-in-chrome-mac-os-x/)
-- [Enabling 3rd Party Chrome user scripts](http://userscripts.org/topics/113176) (OSX)
-
 ## Rough TODO List (Please Help)
 
-- **Make Timetable Page smoother/prettier**
 - Scrub last vestige of CATE from homepage - the favicon! Use [this](http://stackoverflow.com/questions/260857/changing-website-favicon-dynamically/260876#260876)
 - Non-Undergrads may experience missing/broken links. I have no idea.
 
 ## Ideas
 
-- Timetable page
-  - Work on condensed version for dashboard
-  - Notify of upcoming deadlines
-  - Aggregate links to notes, exercises without jumping around a huge
-  table, possibly include a download all function?
+- Put yours here!
 
 ## Development
 
+**TODO: These are out of date!!**
 To develop and help improve classy-cate, do the following:
 
-1. Run the server with `thin start -p 4567 --ssl`
+1. Install gems: `bundle install`
+1. Run the server with `foreman start`
 2. Modify `classy-cate.user.js` to point to your local server assets
-3. Modify `views/classy_cate.coffee.erb` and `views/classy_cate.less` to add/modify functionality as you wish!
+3. Modify `views/classy-cate.coffee.erb` and `views/classy-cate.less` to add/modify functionality as you wish!
 
 ## Want to help, but don't have a clue?
 

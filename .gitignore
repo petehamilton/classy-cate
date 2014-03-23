@@ -5,3 +5,4 @@ compile.sh
 copyTl.sh
 *.sh
 *.sym
+.bundle
