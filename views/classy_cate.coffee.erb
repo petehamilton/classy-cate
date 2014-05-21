@@ -468,8 +468,9 @@ populate_main_page = (vars) ->
   $('#term-selector .btn').each ->
     $(this).addClass('active') if $(this).attr('value') == period.toString()
 
-  lower = new Date()
-  upper = new Date(lower.getTime() + 1000*60*60*24*7 + 1)  # to include full day
+  # to include current day
+  lower = new Date((new Date()).getTime() - 1000*60*60*24)
+  upper = new Date(lower.getTime() + 1000*60*60*24*7)
   load_cate_page $('#nav-exercises').attr('href'), (body) ->
     vars = extract_exercise_page_data body
     [exs_due, exs_late] = [[],[]]
@@ -527,7 +528,7 @@ populate_exercises_page = (vars, forDashboard) ->
         handin_anchor = $(document.createElement('a'))
           .attr('href',ex.handin).html('Hand in').appendTo(id_cell)
         handin_anchor.addClass(
-          if ex.end > (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
+          if ex.end >= (new Date()) then 'handin_link btn btn-primary' else 'btn btn-danger late_handin')
     else
       if not forDashboard? or !/\S/.test(ex.name)
         id_cell.html('{'+ex.id+':'+ex.type+'}') 
@@ -846,4 +847,3 @@ initial_load = ->
     $('body').prepend(cate_notice)
 
 initial_load()
-
